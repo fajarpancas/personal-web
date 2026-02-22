@@ -98,6 +98,49 @@ export default function OnePage() {
           </Reveal>
         </div>
       </section>
+      <footer className="site-footer">
+        <div className="container">
+          <p>© 2026 Fajar Panca</p>
+          <div className="social">
+            <a
+              href="https://github.com/fajarpancas"
+              target="_blank"
+              rel="noreferrer"
+              aria-label="GitHub"
+            >
+              <svg
+                viewBox="0 0 24 24"
+                width="24"
+                height="24"
+                aria-hidden="true"
+              >
+                <path
+                  fill="currentColor"
+                  d="M12 2C6.48 2 2 6.58 2 12.26c0 4.53 2.87 8.37 6.84 9.73.5.1.68-.22.68-.48 0-.24-.01-.87-.01-1.7-2.78.62-3.37-1.37-3.37-1.37-.46-1.2-1.12-1.52-1.12-1.52-.91-.64.07-.63.07-.63 1 .07 1.52 1.06 1.52 1.06.9 1.59 2.36 1.13 2.94.86.09-.67.35-1.13.63-1.39-2.22-.26-4.56-1.14-4.56-5.08 0-1.12.39-2.03 1.03-2.75-.1-.26-.45-1.33.1-2.77 0 0 .85-.28 2.78 1.05.81-.23 1.67-.35 2.53-.35s1.72.12 2.53.35c1.93-1.33 2.78-1.05 2.78-1.05.55 1.44.2 2.51.1 2.77.64.72 1.03 1.63 1.03 2.75 0 3.95-2.34 4.82-4.57 5.08.36.33.68.97.68 1.95 0 1.41-.01 2.55-.01 2.9 0 .27.18.6.69.49A10.05 10.05 0 0 0 22 12.26C22 6.58 17.52 2 12 2z"
+                />
+              </svg>
+            </a>
+            <a
+              href="https://www.linkedin.com/in/fajarpancasaputra/"
+              target="_blank"
+              rel="noreferrer"
+              aria-label="LinkedIn"
+            >
+              <svg
+                viewBox="0 0 24 24"
+                width="24"
+                height="24"
+                aria-hidden="true"
+              >
+                <path
+                  fill="currentColor"
+                  d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-9.9 14H6V10h3.1v7zM7.55 8.86C6.7 8.86 6 8.16 6 7.32s.7-1.54 1.55-1.54 1.55.69 1.55 1.54-.7 1.54-1.55 1.54zM20 17h-3.1v-3.39c0-.81-.02-1.86-1.13-1.86-1.13 0-1.3.88-1.3 1.8V17H11V10h2.97v.96h.04c.41-.77 1.41-1.58 2.9-1.58 3.1 0 3.67 2.04 3.67 4.7V17z"
+                />
+              </svg>
+            </a>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 }

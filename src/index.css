@@ -566,3 +566,35 @@ p {
   border: none;
 }
 .dot.on { background: linear-gradient(90deg, var(--accent), #a78bfa); width: 18px; }
+
+.site-footer {
+  margin-top: 1rem;
+  padding: 1rem 0;
+  border-top: 1px solid var(--border);
+  color: var(--muted);
+  text-align: center;
+}
+.site-footer .social {
+  display: inline-flex;
+  gap: .5rem;
+  align-items: center;
+  justify-content: center;
+  margin-top: .5rem;
+}
+.site-footer .social a {
+  width: 36px;
+  height: 36px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--muted);
+  background: color-mix(in oklab, var(--card) 70%, transparent);
+  transition: color .2s ease, border-color .2s ease, background-color .2s ease;
+}
+.site-footer .social a:hover {
+  color: var(--accent);
+  border-color: color-mix(in oklab, var(--accent) 40%, var(--border));
+}
+.site-footer .social svg { width: 18px; height: 18px; display: block; }
