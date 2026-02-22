@@ -414,7 +414,7 @@ p {
 @media (min-width: 960px) {
   .carousel-track { grid-auto-columns: minmax(420px, 48%); }
   .header-image { height: 280px; }
-  .slide { min-height: 520px; }
+  .slide { min-height: 560px; }
 }
 .slide {
   scroll-snap-align: start;
@@ -424,7 +424,7 @@ p {
   overflow: hidden;
   display: grid;
   grid-template-rows: auto 1fr;
-  min-height: 460px;
+  min-height: 500px;
 }
 .header-image {
   height: 220px;
