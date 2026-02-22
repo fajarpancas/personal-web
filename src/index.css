@@ -157,6 +157,87 @@ p {
   font-size: 1rem;
 }
 
+/* Contact form width: 80% of device, but never exceed container */
+.contact-form {
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: .25rem;
+}
+
+/* Make Contact section truly edge‑to‑edge on mobile */
+#contact .container {
+  /* slightly inset from edges on mobile */
+  width: min(94vw, 100%);
+  max-width: 94vw;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: max(0px, 12px + env(safe-area-inset-left));
+  padding-right: max(0px, 12px + env(safe-area-inset-right));
+}
+@media (min-width: 640px) {
+  #contact .container {
+    width: 100%;
+    max-width: 960px;
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+}
+
+/* Ensure reveal wrapper doesn't constrain width in Contact */
+#contact .reveal { width: 100%; }
+
+/* Guarantee inputs stretch full line */
+.field input,
+.field textarea {
+  display: block;
+}
+
+/* Make actions row match form width and give spacing from fields */
+.contact-form .actions {
+  width: 100%;
+  margin-top: 0.25rem;
+  align-self: stretch;
+  display: block;
+}
+.contact-form .actions .btn { width: 100%; display: block; text-align: center; }
+.contact-row { display: grid; gap: .25rem; }
+@media (min-width: 640px) { .contact-row { grid-template-columns: 1fr 1fr; } }
+.field { display: grid; gap: .35rem; }
+.contact-row + .field { margin-top: .25rem; }
+.field + .field { margin-top: .25rem; }
+.field label { color: var(--muted); font-size: .95rem; }
+.field input,
+.field textarea {
+  width: 100%;
+  color: var(--fg);
+  background: color-mix(in oklab, var(--card) 80%, transparent);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 10px 12px;
+  outline: none;
+}
+.field input:focus,
+.field textarea:focus { border-color: color-mix(in oklab, var(--accent) 50%, var(--border)); }
+.actions { display: flex; gap: .5rem; flex-wrap: wrap; }
+.btn {
+  display: inline-block;
+  padding: 10px 14px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: color-mix(in oklab, var(--card) 75%, transparent);
+  color: var(--fg);
+  text-decoration: none;
+}
+.btn.primary {
+  background: linear-gradient(90deg, color-mix(in oklab, var(--accent) 30%, var(--card)), color-mix(in oklab, #a78bfa 24%, var(--card)));
+  border-color: color-mix(in oklab, var(--accent) 40%, var(--border));
+}
+
 @media (max-width: 640px) {
   h1 { line-height: 1.35; }
   p { line-height: 1.8; }

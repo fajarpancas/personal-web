@@ -91,17 +91,75 @@ export default function OnePage() {
       <section id="contact" className="snap-section section">
         <div className="container">
           <Reveal>
-            <h1>Kontak</h1>
+            <h1>Let's Connect</h1>
           </Reveal>
           <Reveal delay={120}>
-            <p>Email: fajar@example.com</p>
-          </Reveal>
-          <Reveal delay={200}>
-            <p>LinkedIn: linkedin.com/in/fajarpanca</p>
+            <ContactForm />
           </Reveal>
         </div>
       </section>
     </div>
+  );
+}
+
+function ContactForm() {
+  const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const fd = new FormData(e.currentTarget);
+    const name = String(fd.get("name") || "").trim();
+    const subject = String(fd.get("subject") || "").trim();
+    const message = String(fd.get("message") || "").trim();
+    const to = "fajarpancasaputra@gmail.com";
+    const mailSubject = subject || `New message from ${name || "Visitor"}`;
+    const body = [`Name: ${name}`, ``, message].join("\n");
+    const href = `mailto:${to}?subject=${encodeURIComponent(mailSubject)}&body=${encodeURIComponent(body)}`;
+    const a = document.createElement("a");
+    a.href = href;
+    a.style.display = "none";
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+  };
+
+  return (
+    <form className="contact-form" onSubmit={onSubmit}>
+      <div className="contact-row">
+        <div className="field">
+          <input
+            id="name"
+            name="name"
+            type="text"
+            placeholder="Your name"
+            aria-label="Name"
+            required
+          />
+        </div>
+      </div>
+      <div className="field">
+        <input
+          id="subject"
+          name="subject"
+          type="text"
+          placeholder="Subject"
+          aria-label="Subject"
+        />
+      </div>
+      <div className="field">
+        <textarea
+          id="message"
+          name="message"
+          rows={6}
+          placeholder="Write your message..."
+          aria-label="Message"
+          required
+        />
+      </div>
+      <div className="actions">
+        <button type="submit" className="btn primary">
+          Send Email
+        </button>
+      </div>
+    </form>
   );
 }
 
