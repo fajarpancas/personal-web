@@ -32,7 +32,27 @@ export default function NavBar() {
           aria-expanded={open}
           onClick={() => setOpen((v) => !v)}
         >
-          <span />
+          {open ? (
+            // Close Icon
+            <svg width="24" height="24" viewBox="0 0 24 24">
+              <path
+                d="M6 6L18 18M6 18L18 6"
+                stroke="white"
+                strokeWidth="2"
+                strokeLinecap="round"
+              />
+            </svg>
+          ) : (
+            // Hamburger Icon
+            <svg width="24" height="24" viewBox="0 0 24 24">
+              <path
+                d="M4 6H20M4 12H20M4 18H20"
+                stroke="white"
+                strokeWidth="2"
+                strokeLinecap="round"
+              />
+            </svg>
+          )}
         </button>
 
         <ul className="nav desktop">
