@@ -17,6 +17,7 @@ body {
   color: var(--fg);
   scroll-behavior: smooth;
 }
+html { scroll-padding-top: calc(var(--nav-h) + 16px); }
 html, body { overflow-x: hidden; }
 
 .container {
