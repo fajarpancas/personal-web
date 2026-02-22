@@ -38,6 +38,7 @@ html, body { overflow-x: hidden; }
 }
 .snap-section {
   scroll-snap-align: start;
+  scroll-margin-top: calc(var(--nav-h) + 8px);
 }
 .snap { overflow-x: hidden; }
 
