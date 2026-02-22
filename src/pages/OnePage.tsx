@@ -245,7 +245,70 @@ function ProjectsCarousel() {
     {
       title: "Madkhal",
       desc: "An Islamic app with Qibla direction, prayer times (currently Malaysia & Singapore), and free/premium learning content via videos and documents.",
-      img: "/projects/madkhal.jpg",
+      img: "/madkhal.png",
+      appStore: "https://apps.apple.com/id/app/madkhal/id6479597417?l=id",
+      playStore:
+        "https://play.google.com/store/apps/details?id=com.elmadhkhalmobile.app",
+    },
+    {
+      title: "VirtualSpace",
+      desc: "Mobile based chat and project management application",
+      img: "/virtualspace.png",
+      appStore:
+        "https://apps.apple.com/id/app/virtualspace-work-smarter/id1513794884",
+      playStore:
+        "https://play.google.com/store/apps/details?id=me.virtualspirit.virtualspace",
+    },
+    {
+      title: "KoolBuddy",
+      desc: "A digital companion app for carbon‑conscious generation",
+      img: "/koolbuddy.png",
+      appStore: "https://apps.apple.com/mn/app/kool-buddy/id6450994509",
+      playStore: "",
+    },
+    {
+      title: "Achiever Dream+",
+      desc: "Mobile based for chemistry practical examination in Singapore with an NEA‑approved Chemistry Practical Lab",
+      img: "/achiever-dream-plus.png",
+      appStore:
+        "https://apps.apple.com/id/app/achievers-dream/id1662868706?l=id",
+      playStore:
+        "https://play.google.com/store/apps/details?id=com.achieversdream.app",
+    },
+    {
+      title: "Moirai MomCare",
+      desc: "Mobile based to assist every step of pregnancy journey",
+      img: "/momcare.png",
+      appStore: "https://apps.apple.com/sg/app/moirai-momcare/id1663835824",
+      playStore:
+        "https://play.google.com/store/apps/details?id=com.momcare.app",
+    },
+    {
+      title: "Together Living",
+      desc: "Mobile base payment for room rental with features chat, store, reward.",
+      img: "/together-living.png",
+      appStore: "",
+      playStore:
+        "https://play.google.com/store/apps/details?id=com.togetherliving.app",
+    },
+    {
+      title: "Tzu‑Chi Volunteer Management",
+      desc: "Mobile based application volunteer management for Tzu‑Chi Malaysia",
+      img: "/tzu-chi-vms.png",
+      appStore: "",
+      playStore: "",
+    },
+    {
+      title: "WhatsDoc",
+      desc: "Mobile based doctor‑to‑doctor and doctor‑to‑patient consultation via chat or video call",
+      img: "/whatsdoc.png",
+      appStore: "",
+      playStore: "",
+    },
+    {
+      title: "Duedi: The investor's toolkit",
+      desc: "Mobile based toolkits for investor, this app provide 12 free tools for investor",
+      img: "/duedi.png",
       appStore: "",
       playStore: "",
     },
