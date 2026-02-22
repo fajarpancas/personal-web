@@ -413,6 +413,8 @@ p {
 }
 @media (min-width: 960px) {
   .carousel-track { grid-auto-columns: minmax(420px, 48%); }
+  .header-image { height: 280px; }
+  .slide { min-height: 520px; }
 }
 .slide {
   scroll-snap-align: start;
@@ -421,9 +423,11 @@ p {
   border-radius: 12px;
   overflow: hidden;
   display: grid;
+  grid-template-rows: auto 1fr;
+  min-height: 460px;
 }
 .header-image {
-  aspect-ratio: 16 / 9;
+  height: 220px;
   background: linear-gradient(135deg, color-mix(in oklab, var(--card) 70%, transparent), color-mix(in oklab, var(--card) 85%, transparent));
 }
 .header-image img {
