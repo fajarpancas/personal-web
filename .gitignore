@@ -1,0 +1,43 @@
+## OS
+.DS_Store
+Thumbs.db
+
+## Dependencies
+node_modules/
+
+## Build output
+dist/
+build/
+out/
+.vite/
+.parcel-cache/
+
+## Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+logs/
+*.log
+
+## Env files
+.env
+.env.*
+!.env.example
+
+## Coverage
+coverage/
+
+## TypeScript
+*.tsbuildinfo
+
+## Editors/IDE
+.vscode/
+.idea/
+
+## Tooling caches
+.eslintcache
+.stylelintcache
+.turbo/
+
