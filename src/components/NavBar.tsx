@@ -11,6 +11,25 @@ export default function NavBar() {
       history.replaceState(null, "", `/${hash}`);
     }
   };
+  const share = async () => {
+    const url = location.href;
+    const title = document.title;
+    const text = "Check out Fajar Panca’s portfolio";
+    try {
+      // @ts-ignore
+      if (navigator.share) {
+        // @ts-ignore
+        await navigator.share({ title, text, url });
+        return;
+      }
+    } catch {}
+    try {
+      await navigator.clipboard.writeText(url);
+      alert("Link copied");
+    } catch {
+      window.open(url, "_blank");
+    }
+  };
 
   return (
     <header className="navbar">
@@ -89,6 +108,11 @@ export default function NavBar() {
               Contact
             </a>
           </li>
+          <li>
+            <button className="cta" onClick={share} aria-label="Share">
+              Share
+            </button>
+          </li>
         </ul>
       </nav>
 
@@ -129,6 +153,11 @@ export default function NavBar() {
             >
               Contact
             </a>
+          </li>
+          <li>
+            <button className="cta full" onClick={share} aria-label="Share">
+              Share
+            </button>
           </li>
         </ul>
       </div>
