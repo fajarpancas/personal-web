@@ -1,5 +1,6 @@
 import { Routes, Route } from "react-router-dom";
 import OnePage from "./pages/OnePage";
+import QRIS from "./pages/QRIS";
 import NavBar from "./components/NavBar";
 import ScrollProgress from "./components/ScrollProgress";
 import ScrollToTopButton from "./components/ScrollToTopButton";
@@ -16,6 +17,7 @@ export default function App() {
       <main className="snap">
         <Routes>
           <Route path="/" element={<OnePage />} />
+          <Route path="/QRIS" element={<QRIS />} />
         </Routes>
       </main>
       <ScrollToTopButton />
