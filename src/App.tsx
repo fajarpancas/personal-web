@@ -1,4 +1,4 @@
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, useLocation } from "react-router-dom";
 import OnePage from "./pages/OnePage";
 import QRIS from "./pages/QRIS";
 import NavBar from "./components/NavBar";
@@ -8,12 +8,13 @@ import ScrollOnRouteChange from "./components/ScrollOnRouteChange";
 import ScrollToHash from "./components/ScrollToHash";
 
 export default function App() {
+  const location = useLocation();
   return (
     <>
       <ScrollOnRouteChange />
       <ScrollToHash />
       <ScrollProgress />
-      <NavBar />
+      {location.pathname !== "/QRIS" && <NavBar />}
       <main className="snap">
         <Routes>
           <Route path="/" element={<OnePage />} />
