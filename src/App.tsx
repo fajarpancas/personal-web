@@ -9,12 +9,14 @@ import ScrollToHash from "./components/ScrollToHash";
 
 export default function App() {
   const location = useLocation();
+  const path = location.pathname.replace(/\/+$/, "").toLowerCase();
+  const hideNav = path.startsWith("/qris");
   return (
     <>
       <ScrollOnRouteChange />
       <ScrollToHash />
       <ScrollProgress />
-      {location.pathname !== "/QRIS" && <NavBar />}
+      {!hideNav && <NavBar />}
       <main className="snap">
         <Routes>
           <Route path="/" element={<OnePage />} />
