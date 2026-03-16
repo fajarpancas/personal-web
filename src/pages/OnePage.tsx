@@ -8,14 +8,30 @@ export default function OnePage() {
         <div className="container hero">
           <div>
             <Reveal>
-              <h1>Fajar Panca — Frontend Developer</h1>
+              <p className="hero-eyebrow">Frontend Developer</p>
+            </Reveal>
+            <Reveal delay={80}>
+              <h1>Fajar Panca</h1>
             </Reveal>
             <Reveal delay={200}>
-              <p>
-                I'm a frontend developer with 6+ years of experience. I've built
-                15+ mobile apps with React Native and published them on the App
-                Store (iOS) and Google Play (Android).
+              <p className="hero-bio">
+                6+ years building mobile apps people actually use — 15+ apps
+                shipped on the App Store and Google Play.
               </p>
+            </Reveal>
+            <Reveal delay={300}>
+              <a
+                href="/#projects"
+                className="hero-cta"
+                onClick={(e) => {
+                  e.preventDefault();
+                  document
+                    .querySelector("#projects")
+                    ?.scrollIntoView({ behavior: "smooth", block: "start" });
+                }}
+              >
+                See My Work →
+              </a>
             </Reveal>
           </div>
           <Reveal delay={180} variant="scale">
@@ -93,7 +109,12 @@ export default function OnePage() {
           <Reveal>
             <h1>Let's Connect</h1>
           </Reveal>
-          <Reveal delay={120}>
+          <Reveal delay={80}>
+            <p style={{ marginTop: "0.25rem", marginBottom: "1rem" }}>
+              Have a project idea or just want to chat? I'd love to hear from you.
+            </p>
+          </Reveal>
+          <Reveal delay={160}>
             <ContactForm />
           </Reveal>
         </div>
