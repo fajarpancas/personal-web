@@ -250,8 +250,17 @@ p {
   p { font-size: 0.98rem; line-height: 1.75; }
 }
 @media (min-width: 1024px) {
-  h1 { font-size: 4rem; line-height: 1.1; }
+  h1 { font-size: 3.5rem; line-height: 1.1; }
   p { font-size: 1.125rem; line-height: 1.75; }
+}
+
+.hero h1 {
+  font-size: clamp(2.75rem, 7vw, 6rem);
+  line-height: 1.05;
+  background: linear-gradient(135deg, #ffffff 30%, var(--accent) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 .hero-eyebrow {
@@ -290,19 +299,23 @@ p {
 .hero {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 1.25rem;
+  gap: 2rem;
   align-items: center;
 }
 @media (min-width: 640px) {
-  .hero { grid-template-columns: 1fr 1fr; }
+  .hero { grid-template-columns: 1fr 1fr; gap: 3rem; }
+}
+@media (min-width: 1024px) {
+  .hero { grid-template-columns: 1.2fr 1fr; gap: 4rem; }
+  #home .container { max-width: 1100px; }
 }
 .hero img { max-width: 100%; display: block; }
 .profile {
-  width: clamp(160px, 48vw, 280px);
+  width: clamp(180px, 40vw, 360px);
   aspect-ratio: 1 / 1;
   border-radius: 24px;
   border: 1px solid var(--border);
-  box-shadow: 0 14px 34px rgba(0,0,0,.35);
+  box-shadow: 0 14px 34px rgba(0,0,0,.35), 0 0 0 1px color-mix(in oklab, var(--accent) 20%, transparent);
   object-fit: cover;
   background: var(--card);
 }
