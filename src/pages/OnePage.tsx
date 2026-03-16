@@ -50,6 +50,7 @@ export default function OnePage() {
       <section id="about" className="snap-section section">
         <div className="container">
           <Reveal>
+            <p className="section-eyebrow">Career</p>
             <h1>Work Experiences</h1>
           </Reveal>
           <Reveal delay={120}>
@@ -60,35 +61,93 @@ export default function OnePage() {
             </p>
           </Reveal>
           <Reveal delay={200} variant="left">
-            <ul className="cards experience">
-              <li className="card">
-                <div className="card-head">
-                  <h3>VirtualSpirit</h3>
-                  <span className="badge">11 apps</span>
+            <ul className="timeline">
+              <li className="tl-item">
+                <div className="tl-dot" data-color="cyan">
+                  <span className="tl-initial">VS</span>
                 </div>
-                <ul className="exp-meta">
-                  <li>Full-time: Dec 2019 – Nov 2022</li>
-                  <li>Part-time: Nov 2022 – Nov 2023</li>
-                  <li>Full-time: Nov 2023 – Present</li>
-                </ul>
+                <div className="tl-content">
+                  <div className="tl-head">
+                    <h3 className="tl-company">VirtualSpirit</h3>
+                    <span className="badge">11 apps</span>
+                  </div>
+                  <p className="tl-desc">
+                    Mobile app studio building products across logistics,
+                    fintech, and productivity — spanning React Native,
+                    TypeScript, and real-time features.
+                  </p>
+                  <ul className="tl-roles">
+                    <li className="tl-role">
+                      <span className="role-type ft">Full-time</span>
+                      <span className="role-period">Dec 2019 – Nov 2022</span>
+                    </li>
+                    <li className="tl-role">
+                      <span className="role-type pt">Part-time</span>
+                      <span className="role-period">Nov 2022 – Nov 2023</span>
+                    </li>
+                    <li className="tl-role">
+                      <span className="role-type ft">Full-time</span>
+                      <span className="role-period">Nov 2023 – Present</span>
+                      <span className="badge-current">Current</span>
+                    </li>
+                  </ul>
+                  <div className="tl-tags">
+                    <span className="tag">React Native</span>
+                    <span className="tag">TypeScript</span>
+                    <span className="tag">Redux</span>
+                  </div>
+                </div>
               </li>
-              <li className="card">
-                <div className="card-head">
-                  <h3>Dagangan</h3>
-                  <span className="badge">1 app</span>
+              <li className="tl-item">
+                <div className="tl-dot" data-color="purple">
+                  <span className="tl-initial">DG</span>
                 </div>
-                <ul className="exp-meta">
-                  <li>Full-time: Nov 2022 – Nov 2023</li>
-                </ul>
+                <div className="tl-content">
+                  <div className="tl-head">
+                    <h3 className="tl-company">Dagangan</h3>
+                    <span className="badge">1 app</span>
+                  </div>
+                  <p className="tl-desc">
+                    E-commerce platform connecting rural communities with
+                    FMCG products, built for low-bandwidth environments.
+                  </p>
+                  <ul className="tl-roles">
+                    <li className="tl-role">
+                      <span className="role-type ft">Full-time</span>
+                      <span className="role-period">Nov 2022 – Nov 2023</span>
+                    </li>
+                  </ul>
+                  <div className="tl-tags">
+                    <span className="tag">React Native</span>
+                    <span className="tag">TypeScript</span>
+                  </div>
+                </div>
               </li>
-              <li className="card">
-                <div className="card-head">
-                  <h3>AntriQue</h3>
-                  <span className="badge">4 apps</span>
+              <li className="tl-item">
+                <div className="tl-dot" data-color="amber">
+                  <span className="tl-initial">AQ</span>
                 </div>
-                <ul className="exp-meta">
-                  <li>Part-time: Sep 2020 – Aug 2021</li>
-                </ul>
+                <div className="tl-content">
+                  <div className="tl-head">
+                    <h3 className="tl-company">AntriQue</h3>
+                    <span className="badge">4 apps</span>
+                  </div>
+                  <p className="tl-desc">
+                    Smart queue management system with Bluetooth thermal
+                    printer integration for merchants and customers.
+                  </p>
+                  <ul className="tl-roles">
+                    <li className="tl-role">
+                      <span className="role-type pt">Part-time</span>
+                      <span className="role-period">Sep 2020 – Aug 2021</span>
+                    </li>
+                  </ul>
+                  <div className="tl-tags">
+                    <span className="tag">React Native</span>
+                    <span className="tag">Bluetooth</span>
+                    <span className="tag">TypeScript</span>
+                  </div>
+                </div>
               </li>
             </ul>
           </Reveal>
