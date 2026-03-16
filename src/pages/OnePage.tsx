@@ -95,6 +95,10 @@ export default function OnePage() {
                     <span className="tag">React Native</span>
                     <span className="tag">TypeScript</span>
                     <span className="tag">Redux</span>
+                    <span className="tag">Redux Saga</span>
+                    <span className="tag">Zustand</span>
+                    <span className="tag">Android Kotlin</span>
+                    <span className="tag">iOS Swift</span>
                   </div>
                 </div>
               </li>
@@ -120,6 +124,7 @@ export default function OnePage() {
                   <div className="tl-tags">
                     <span className="tag">React Native</span>
                     <span className="tag">TypeScript</span>
+                    <span className="tag">Redux</span>
                   </div>
                 </div>
               </li>
@@ -144,8 +149,9 @@ export default function OnePage() {
                   </ul>
                   <div className="tl-tags">
                     <span className="tag">React Native</span>
-                    <span className="tag">Bluetooth</span>
                     <span className="tag">TypeScript</span>
+                    <span className="tag">Redux</span>
+                    <span className="tag">Bluetooth</span>
                   </div>
                 </div>
               </li>
@@ -157,6 +163,7 @@ export default function OnePage() {
       <section id="projects" className="snap-section section">
         <div className="container">
           <Reveal>
+            <p className="section-eyebrow">Portfolio</p>
             <h1>Projects</h1>
           </Reveal>
           <ProjectsCarousel />
@@ -449,35 +456,27 @@ function ProjectsCarousel() {
               <div className="header-image">
                 <img
                   src={p.img}
-                  alt=""
+                  alt={p.title}
                   onError={(e) => {
-                    (e.currentTarget as HTMLImageElement).style.display =
-                      "none";
+                    (e.currentTarget as HTMLImageElement).style.display = "none";
                   }}
                 />
+                <div className="slide-img-overlay" />
               </div>
               <div className="slide-body">
-                <h3>{p.title}</h3>
-                <p>{p.desc}</p>
+                <h3 className="slide-title">{p.title}</h3>
+                <p className="slide-desc">{p.desc}</p>
                 {(p.appStore || p.playStore) && (
                   <div className="store-buttons">
                     {p.appStore && (
-                      <a
-                        href={p.appStore}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="store-btn appstore"
-                      >
+                      <a href={p.appStore} target="_blank" rel="noreferrer" className="store-btn appstore">
+                        <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" aria-hidden="true"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
                         App Store
                       </a>
                     )}
                     {p.playStore && (
-                      <a
-                        href={p.playStore}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="store-btn playstore"
-                      >
+                      <a href={p.playStore} target="_blank" rel="noreferrer" className="store-btn playstore">
+                        <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" aria-hidden="true"><path d="M3.18 23.76c.3.17.64.22.98.15l12.04-6.96-2.8-2.8-10.22 9.61zm-1.1-19.76c-.06.19-.08.4-.08.62v18.76c0 .22.02.43.08.62l.06.06L13.2 12l-.06-.06L2.08 3.94l-.06.06zm20.01 8.43l-2.88-1.66-3.13 3.13 3.13 3.13 2.9-1.67c.83-.48.83-1.26-.02-1.93zM4.16.24L16.2 7.2l-2.8 2.8L3.18.24C3.5.07 3.88.1 4.16.24z"/></svg>
                         Google Play
                       </a>
                     )}
@@ -487,22 +486,28 @@ function ProjectsCarousel() {
             </article>
           ))}
         </div>
+
         <div className="carousel-controls">
-          <button className="car-btn" onClick={prev} aria-label="Previous">
-            ‹
+          <button className="car-btn" onClick={prev} aria-label="Previous" disabled={active === 0}>
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
           </button>
-          <div className="dots">
-            {data.map((_, i) => (
-              <button
-                key={i}
-                className={`dot ${i === active ? "on" : ""}`}
-                aria-label={`Go to slide ${i + 1}`}
-                onClick={() => scrollToIndex(i)}
+
+          <div className="carousel-progress-wrap">
+            <div className="carousel-counter">
+              <span className="carousel-current">{String(active + 1).padStart(2, "0")}</span>
+              <span className="carousel-sep"> / </span>
+              <span className="carousel-total">{String(data.length).padStart(2, "0")}</span>
+            </div>
+            <div className="carousel-bar">
+              <div
+                className="carousel-bar-fill"
+                style={{ width: `${((active + 1) / data.length) * 100}%` }}
               />
-            ))}
+            </div>
           </div>
-          <button className="car-btn" onClick={next} aria-label="Next">
-            ›
+
+          <button className="car-btn" onClick={next} aria-label="Next" disabled={active === data.length - 1}>
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
           </button>
         </div>
       </div>
