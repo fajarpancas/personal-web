@@ -12,7 +12,7 @@ import ScrollToHash from "./components/ScrollToHash";
 export default function App() {
   const location = useLocation();
   const path = location.pathname.replace(/\/+$/, "").toLowerCase();
-  const hideNav = path.startsWith("/qris");
+  const hideNav = path.startsWith("/qris") || path === "/add-address" || path === "/list-address";
   const noSnap = path === "/add-address" || path === "/list-address";
   return (
     <>
