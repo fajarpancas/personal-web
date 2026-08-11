@@ -6,9 +6,10 @@ type Props = {
   children: React.ReactNode
   variant?: Variant
   delay?: number
+  className?: string
 }
 
-export default function Reveal({ children, variant = 'up', delay = 0 }: Props) {
+export default function Reveal({ children, variant = 'up', delay = 0, className = '' }: Props) {
   const ref = useRef<HTMLDivElement | null>(null)
   const [visible, setVisible] = useState(false)
 
@@ -30,7 +31,7 @@ export default function Reveal({ children, variant = 'up', delay = 0 }: Props) {
   return (
     <div
       ref={ref}
-      className={`reveal reveal-${variant} ${visible ? 'is-visible' : ''}`}
+      className={`reveal reveal-${variant} ${visible ? 'is-visible' : ''} ${className}`.trim()}
       style={{ transitionDelay: `${delay}ms` }}
     >
       {children}

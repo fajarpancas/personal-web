@@ -1,22 +1,21 @@
 import { useEffect, useState } from 'react'
+import { getScrollY, scrollToTop } from '../utils/scroll'
 
 export default function ScrollToTopButton() {
   const [show, setShow] = useState(false)
 
   useEffect(() => {
-    const handler = () => setShow(window.scrollY > 240)
+    const handler = () => setShow(getScrollY() > 240)
     handler()
-    window.addEventListener('scroll', handler, { passive: true })
-    return () => window.removeEventListener('scroll', handler)
+    window.addEventListener('scroll', handler, { passive: true, capture: true })
+    return () => window.removeEventListener('scroll', handler, { capture: true } as EventListenerOptions)
   }, [])
-
-  const onClick = () => window.scrollTo({ top: 0, behavior: 'smooth' })
 
   return (
     <button
       className={`scroll-top ${show ? 'show' : ''}`}
       aria-label="Scroll to top"
-      onClick={onClick}
+      onClick={() => scrollToTop('smooth')}
     >
       ↑
     </button>

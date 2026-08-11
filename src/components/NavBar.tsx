@@ -1,7 +1,29 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { getScrollY } from "../utils/scroll";
 
 export default function NavBar() {
   const [open, setOpen] = useState(false);
+  const [active, setActive] = useState("home");
+
+  // Scroll spy: highlight the nav link of the section in view
+  useEffect(() => {
+    const ids = ["home", "about", "projects", "contact"];
+    const onScroll = () => {
+      const pos = getScrollY() + 140;
+      let current = "home";
+      for (const id of ids) {
+        const el = document.getElementById(id);
+        if (el && el.offsetTop <= pos) current = id;
+      }
+      setActive(current);
+    };
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true, capture: true });
+    return () =>
+      window.removeEventListener("scroll", onScroll, {
+        capture: true,
+      } as EventListenerOptions);
+  }, []);
 
   const scrollTo = (selector: string) => {
     const el = document.querySelector<HTMLElement>(selector);
@@ -59,6 +81,7 @@ export default function NavBar() {
           <li>
             <a
               href="/#about"
+              className={active === "about" ? "active" : ""}
               onClick={(e) => {
                 e.preventDefault();
                 scrollTo("#about");
@@ -70,6 +93,7 @@ export default function NavBar() {
           <li>
             <a
               href="/#projects"
+              className={active === "projects" ? "active" : ""}
               onClick={(e) => {
                 e.preventDefault();
                 scrollTo("#projects");
@@ -81,6 +105,7 @@ export default function NavBar() {
           <li>
             <a
               href="/#contact"
+              className={active === "contact" ? "active" : ""}
               onClick={(e) => {
                 e.preventDefault();
                 scrollTo("#contact");
@@ -97,6 +122,7 @@ export default function NavBar() {
           <li>
             <a
               href="/#about"
+              className={active === "about" ? "active" : ""}
               onClick={(e) => {
                 e.preventDefault();
                 scrollTo("#about");
@@ -109,6 +135,7 @@ export default function NavBar() {
           <li>
             <a
               href="/#projects"
+              className={active === "projects" ? "active" : ""}
               onClick={(e) => {
                 e.preventDefault();
                 scrollTo("#projects");
@@ -121,6 +148,7 @@ export default function NavBar() {
           <li>
             <a
               href="/#contact"
+              className={active === "contact" ? "active" : ""}
               onClick={(e) => {
                 e.preventDefault();
                 scrollTo("#contact");

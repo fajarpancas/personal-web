@@ -12,7 +12,7 @@ export default function OnePage() {
             <Reveal delay={200}>
               <p>
                 I'm a frontend developer with 6+ years of experience. I've built
-                15+ mobile apps with React Native and published them on the App
+                17+ mobile apps with React Native and published them on the App
                 Store (iOS) and Google Play (Android).
               </p>
             </Reveal>

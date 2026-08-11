@@ -20,6 +20,7 @@ export default function App() {
       <ScrollToHash />
       <ScrollProgress />
       {!hideNav && <NavBar />}
+      <div className="aurora" aria-hidden="true" />
       <main className={noSnap ? "" : "snap"}>
         <Routes>
           <Route path="/" element={<OnePage />} />
@@ -29,6 +30,7 @@ export default function App() {
         </Routes>
       </main>
       <ScrollToTopButton />
+      <div className="grain" aria-hidden="true" />
     </>
   );
 }

@@ -1,5 +1,6 @@
 import { useEffect, useRef } from "react";
 import { useLocation } from "react-router-dom";
+import { getScrollHeight, scrollToY } from "../utils/scroll";
 
 const order: Record<string, number> = {
   "/": 0,
@@ -22,9 +23,9 @@ export default function ScrollOnRouteChange() {
     const goingDown = nextIndex > prevIndex;
 
     const run = () => {
-      const height = document.documentElement.scrollHeight - window.innerHeight;
+      const height = getScrollHeight() - window.innerHeight;
       const target = goingDown ? Math.max(0, height) : 0;
-      window.scrollTo({ top: target, behavior: "smooth" });
+      scrollToY(target, "smooth");
     };
     requestAnimationFrame(() => requestAnimationFrame(run));
   }, [location.pathname]);

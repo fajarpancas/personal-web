@@ -31,6 +31,9 @@ coverage/
 
 ## TypeScript
 *.tsbuildinfo
+# tsc -b emits JS + declarations next to sources
+src/**/*.js
+src/**/*.d.ts
 
 ## Editors/IDE
 .vscode/
