@@ -1,0 +1,29 @@
+rules_version = '2';
+
+// HOW TO DEPLOY:
+// Firebase console → project → Firestore Database → Rules → paste this file → Publish.
+// Until deployed, the database runs in "test mode" (public read AND write), so the
+// admin panel is NOT protected yet. Deploy these rules to lock it down.
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ── Admin content (homepage data) ─────────────────────
+    // Public read: visitors must see the latest content.
+    // Write: only a signed-in user — and since the ONLY account in this
+    // project is the admin's (created manually in console → Authentication),
+    // this effectively means admin-only.
+    match /content/{docId} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+
+    // ── Address book (QRIS public form) ───────────────────
+    // Intentionally public write — anyone with the link can submit an
+    // address (that's the feature's purpose). Size guard limits abuse.
+    match /addresses/{docId} {
+      allow read: if true;
+      allow write: if request.resource.data.size() < 10000;
+    }
+  }
+}

@@ -1,7 +1,11 @@
 import Reveal from "../components/Reveal";
 import { useEffect, useRef, useState } from "react";
+import { usePortfolioContent } from "../lib/content";
+import type { Experience, Project, Stat as StatData } from "../data/portfolio";
 
 export default function OnePage() {
+  const { content } = usePortfolioContent();
+  const { hero, stats, skills, about, experiences, contact, projects, footer } = content;
   const visualRef = useRef<HTMLDivElement>(null);
 
   const handleTilt = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -32,39 +36,35 @@ export default function OnePage() {
           <div>
             <Reveal>
               <p className="hero-eyebrow">
-                <Typewriter
-                  words={[
-                    "Frontend Developer",
-                    "React Native Developer",
-                    "Mobile Engineer",
-                  ]}
-                />
+                <Typewriter words={hero.roles} />
               </p>
             </Reveal>
             <Reveal delay={80}>
-              <h1>Fajar Panca</h1>
+              <h1>{hero.name}</h1>
             </Reveal>
             <Reveal delay={200}>
               <p className="hero-bio">
-                <StaggerWords text="6+ years building mobile apps people actually use — 17+ apps shipped on the App Store and Google Play." />
+                <StaggerWords text={hero.bio} />
               </p>
             </Reveal>
             <Reveal delay={300}>
-              <a
-                href="/#projects"
-                className="hero-cta"
-                onClick={(e) => {
-                  e.preventDefault();
-                  document
-                    .querySelector("#projects")
-                    ?.scrollIntoView({ behavior: "smooth", block: "start" });
-                }}
-              >
-                See My Work →
-              </a>
+              <Magnetic>
+                <a
+                  href="/#projects"
+                  className="hero-cta"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    document
+                      .querySelector("#projects")
+                      ?.scrollIntoView({ behavior: "smooth", block: "start" });
+                  }}
+                >
+                  {hero.cta}
+                </a>
+              </Magnetic>
             </Reveal>
             <Reveal delay={380}>
-              <HeroSocials />
+              <HeroSocials contact={contact} />
             </Reveal>
           </div>
 
@@ -77,28 +77,28 @@ export default function OnePage() {
             >
               <div className="profile-frame">
                 <img
-                  src="/profile.png"
+                  src={hero.profileImg}
                   onError={(e) => {
                     e.currentTarget.src = "/profile.svg";
                   }}
-                  alt="Foto profil Fajar Panca"
+                  alt={`Foto profil ${hero.name}`}
                   className="profile profile-round"
                 />
                 <div className="glare" aria-hidden="true" />
               </div>
               <div className="orbit" aria-hidden="true" />
               <div className="float-card float-card-b">
-                🚀 <b>17+</b> apps shipped
+                <span aria-hidden="true">{hero.floatBadge.icon}</span>{" "}
+                <b>{hero.floatBadge.value}</b> {hero.floatBadge.label}
               </div>
             </div>
           </Reveal>
 
           <Reveal delay={240} className="hero-stats">
             <div className="stats">
-              <Stat value={6} suffix="+" label="Years Experience" />
-              <Stat value={17} suffix="+" label="Apps Shipped" />
-              <Stat value={4} label="Companies" />
-              <Stat value={2} label="Platforms" sub="iOS & Android" />
+              {stats.map((s, i) => (
+                <Stat key={`${s.label}-${i}`} {...s} />
+              ))}
             </div>
           </Reveal>
         </div>
@@ -121,7 +121,7 @@ export default function OnePage() {
       {/* ── Skills marquee divider ───────────────────────── */}
       <section className="skills-section">
         <div className="container">
-          <SkillsMarquee />
+          <SkillsMarquee skills={skills} />
         </div>
       </section>
 
@@ -129,111 +129,17 @@ export default function OnePage() {
       <section id="about" className="snap-section section">
         <div className="container">
           <Reveal>
-            <p className="section-eyebrow">Career</p>
-            <h1>Work Experiences</h1>
+            <p className="section-eyebrow">{about.eyebrow}</p>
+            <h1>{about.title}</h1>
           </Reveal>
           <Reveal delay={120}>
-            <p>
-              Frontend Developer focused on React Native across full-time and
-              part-time roles since 2019, delivering mobile apps while balancing
-              concurrent engagements.
-            </p>
+            <p>{about.intro}</p>
           </Reveal>
           <Reveal delay={200} variant="left">
             <ul className="timeline">
-              <li className="tl-item">
-                <div className="tl-dot" data-color="cyan">
-                  <span className="tl-initial">VS</span>
-                </div>
-                <div className="tl-content">
-                  <div className="tl-head">
-                    <h3 className="tl-company">VirtualSpirit</h3>
-                    <span className="badge">11 apps</span>
-                  </div>
-                  <p className="tl-desc">
-                    Mobile app studio building products across logistics,
-                    fintech, and productivity — spanning React Native,
-                    TypeScript, and real-time features.
-                  </p>
-                  <ul className="tl-roles">
-                    <li className="tl-role">
-                      <span className="role-type ft">Full-time</span>
-                      <span className="role-period">Dec 2019 – Nov 2022</span>
-                    </li>
-                    <li className="tl-role">
-                      <span className="role-type pt">Part-time</span>
-                      <span className="role-period">Nov 2022 – Nov 2023</span>
-                    </li>
-                    <li className="tl-role">
-                      <span className="role-type ft">Full-time</span>
-                      <span className="role-period">Nov 2023 – Present</span>
-                      <span className="badge-current">Current</span>
-                    </li>
-                  </ul>
-                  <div className="tl-tags">
-                    <span className="tag">React Native</span>
-                    <span className="tag">TypeScript</span>
-                    <span className="tag">Redux</span>
-                    <span className="tag">Redux Saga</span>
-                    <span className="tag">Zustand</span>
-                    <span className="tag">Android Kotlin</span>
-                    <span className="tag">iOS Swift</span>
-                  </div>
-                </div>
-              </li>
-              <li className="tl-item">
-                <div className="tl-dot" data-color="purple">
-                  <span className="tl-initial">DG</span>
-                </div>
-                <div className="tl-content">
-                  <div className="tl-head">
-                    <h3 className="tl-company">Dagangan</h3>
-                    <span className="badge">1 app</span>
-                  </div>
-                  <p className="tl-desc">
-                    E-commerce platform connecting rural communities with
-                    FMCG products, built for low-bandwidth environments.
-                  </p>
-                  <ul className="tl-roles">
-                    <li className="tl-role">
-                      <span className="role-type ft">Full-time</span>
-                      <span className="role-period">Nov 2022 – Nov 2023</span>
-                    </li>
-                  </ul>
-                  <div className="tl-tags">
-                    <span className="tag">React Native</span>
-                    <span className="tag">TypeScript</span>
-                    <span className="tag">Redux</span>
-                  </div>
-                </div>
-              </li>
-              <li className="tl-item">
-                <div className="tl-dot" data-color="amber">
-                  <span className="tl-initial">AQ</span>
-                </div>
-                <div className="tl-content">
-                  <div className="tl-head">
-                    <h3 className="tl-company">AntriQue</h3>
-                    <span className="badge">4 apps</span>
-                  </div>
-                  <p className="tl-desc">
-                    Smart queue management system with Bluetooth thermal
-                    printer integration for merchants and customers.
-                  </p>
-                  <ul className="tl-roles">
-                    <li className="tl-role">
-                      <span className="role-type pt">Part-time</span>
-                      <span className="role-period">Sep 2020 – Aug 2021</span>
-                    </li>
-                  </ul>
-                  <div className="tl-tags">
-                    <span className="tag">React Native</span>
-                    <span className="tag">TypeScript</span>
-                    <span className="tag">Redux</span>
-                    <span className="tag">Bluetooth</span>
-                  </div>
-                </div>
-              </li>
+              {experiences.map((exp) => (
+                <ExperienceItem key={exp.company} exp={exp} />
+              ))}
             </ul>
           </Reveal>
         </div>
@@ -243,10 +149,10 @@ export default function OnePage() {
       <section id="projects" className="snap-section section">
         <div className="container">
           <Reveal>
-            <p className="section-eyebrow">Portfolio</p>
-            <h1>Projects</h1>
+            <p className="section-eyebrow">{content.projectsEyebrow}</p>
+            <h1>{content.projectsTitle}</h1>
           </Reveal>
-          <ProjectsCarousel />
+          <ProjectsCarousel projects={projects} />
         </div>
       </section>
 
@@ -256,33 +162,20 @@ export default function OnePage() {
           <div className="contact-wrap">
             <div className="contact-intro">
               <Reveal>
-                <p className="section-eyebrow">Contact</p>
-                <h1>Let's Connect</h1>
+                <p className="section-eyebrow">{contact.eyebrow}</p>
+                <h1>{contact.title}</h1>
               </Reveal>
               <Reveal delay={80}>
-                <p>
-                  Have a project idea or just want to chat? I'd love to hear
-                  from you — my inbox is always open.
-                </p>
+                <p>{contact.intro}</p>
               </Reveal>
               <Reveal delay={140}>
                 <ul className="contact-list">
                   <li>
-                    <a href="mailto:fajarpancasaputra@gmail.com">
-                      <span className="ci-icon">
-                        <MailIcon />
-                      </span>
-                      <span className="ci-body">
-                        <span className="ci-label">Email</span>
-                        <span className="ci-value">
-                          fajarpancasaputra@gmail.com
-                        </span>
-                      </span>
-                    </a>
+                    <CopyEmail email={contact.email} />
                   </li>
                   <li>
                     <a
-                      href="https://www.linkedin.com/in/fajarpancasaputra/"
+                      href={contact.linkedinUrl}
                       target="_blank"
                       rel="noreferrer"
                     >
@@ -291,15 +184,13 @@ export default function OnePage() {
                       </span>
                       <span className="ci-body">
                         <span className="ci-label">LinkedIn</span>
-                        <span className="ci-value">
-                          in/fajarpancasaputra
-                        </span>
+                        <span className="ci-value">{contact.linkedinHandle}</span>
                       </span>
                     </a>
                   </li>
                   <li>
                     <a
-                      href="https://github.com/fajarpancas"
+                      href={contact.githubUrl}
                       target="_blank"
                       rel="noreferrer"
                     >
@@ -308,7 +199,7 @@ export default function OnePage() {
                       </span>
                       <span className="ci-body">
                         <span className="ci-label">GitHub</span>
-                        <span className="ci-value">@fajarpancas</span>
+                        <span className="ci-value">{contact.githubHandle}</span>
                       </span>
                     </a>
                   </li>
@@ -317,7 +208,7 @@ export default function OnePage() {
             </div>
             <Reveal delay={180}>
               <div className="contact-card">
-                <ContactForm />
+                <ContactForm email={contact.email} />
               </div>
             </Reveal>
           </div>
@@ -326,13 +217,10 @@ export default function OnePage() {
 
       <footer className="site-footer">
         <div className="container">
-          <p>
-            © 2026 Fajar Panca · crafted with{" "}
-            <span className="footer-heart">♥</span> in Indonesia
-          </p>
+          <p>{footer.replace("{year}", String(new Date().getFullYear()))}</p>
           <div className="social">
             <a
-              href="https://github.com/fajarpancas"
+              href={contact.githubUrl}
               target="_blank"
               rel="noreferrer"
               aria-label="GitHub"
@@ -340,18 +228,44 @@ export default function OnePage() {
               <GitHubIcon />
             </a>
             <a
-              href="https://www.linkedin.com/in/fajarpancasaputra/"
+              href={contact.linkedinUrl}
               target="_blank"
               rel="noreferrer"
               aria-label="LinkedIn"
             >
               <LinkedInIcon />
             </a>
+            <a href="/admin" className="admin-link" aria-label="Admin Panel" title="Admin Panel">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <circle cx="12" cy="12" r="3.2" />
+                <path d="M19.4 15a1.7 1.7 0 0 0 .34 1.87l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.7 1.7 0 0 0-1.87-.34 1.7 1.7 0 0 0-1.03 1.56V21a2 2 0 1 1-4 0v-.09a1.7 1.7 0 0 0-1.11-1.56 1.7 1.7 0 0 0-1.87.34l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.7 1.7 0 0 0 .34-1.87 1.7 1.7 0 0 0-1.56-1.03H3a2 2 0 1 1 0-4h.09a1.7 1.7 0 0 0 1.56-1.11 1.7 1.7 0 0 0-.34-1.87l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.7 1.7 0 0 0 1.87.34h.08a1.7 1.7 0 0 0 1.03-1.56V3a2 2 0 1 1 4 0v.09a1.7 1.7 0 0 0 1.03 1.56 1.7 1.7 0 0 0 1.87-.34l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.7 1.7 0 0 0-.34 1.87v.08a1.7 1.7 0 0 0 1.56 1.03H21a2 2 0 1 1 0 4h-.09a1.7 1.7 0 0 0-1.51 1.03z" />
+              </svg>
+            </a>
           </div>
         </div>
       </footer>
     </div>
   );
+}
+
+/* ── Project image with graceful fallback ──────────────── */
+
+function ProjectImage({ src, alt }: { src: string; alt: string }) {
+  const [failed, setFailed] = useState(false);
+  // Reset whenever the src changes (e.g. Firestore content loads after the
+  // first render) so a previously-broken image isn't stuck hidden.
+  useEffect(() => {
+    setFailed(false);
+  }, [src]);
+
+  if (failed) {
+    return (
+      <div className="slide-img-placeholder" role="img" aria-label={alt}>
+        <span>{alt.charAt(0).toUpperCase()}</span>
+      </div>
+    );
+  }
+  return <img src={src} alt={alt} loading="lazy" onError={() => setFailed(true)} />;
 }
 
 /* ── Icons ─────────────────────────────────────────────── */
@@ -397,6 +311,43 @@ function MailIcon() {
   );
 }
 
+/* ── Experience timeline item ───────────────────────────── */
+
+function ExperienceItem({ exp }: { exp: Experience }) {
+  return (
+    <li className="tl-item">
+      <div className="tl-dot">
+        <span className="tl-initial">{exp.initial}</span>
+      </div>
+      <div className="tl-content">
+        <div className="tl-head">
+          <h3 className="tl-company">{exp.company}</h3>
+          <span className="badge">{exp.badge}</span>
+        </div>
+        <p className="tl-desc">{exp.desc}</p>
+        <ul className="tl-roles">
+          {exp.roles.map((r, i) => (
+            <li className="tl-role" key={i}>
+              <span className={`role-type ${r.type === "Full-time" ? "ft" : "pt"}`}>
+                {r.type}
+              </span>
+              <span className="role-period">{r.period}</span>
+              {r.current && <span className="badge-current">Current</span>}
+            </li>
+          ))}
+        </ul>
+        <div className="tl-tags">
+          {exp.tags.map((t) => (
+            <span className="tag" key={t}>
+              {t}
+            </span>
+          ))}
+        </div>
+      </div>
+    </li>
+  );
+}
+
 /* ── Staggered word reveal ─────────────────────────────── */
 
 function StaggerWords({ text }: { text: string }) {
@@ -417,37 +368,131 @@ function StaggerWords({ text }: { text: string }) {
   );
 }
 
+/* ── Magnetic wrapper ────────────────────────────────────── */
+
+function Magnetic({
+  children,
+  strength = 0.22,
+}: {
+  children: React.ReactNode;
+  strength?: number;
+}) {
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    if (window.matchMedia("(hover: none)").matches) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const onMove = (e: MouseEvent) => {
+      const r = el.getBoundingClientRect();
+      const dx = e.clientX - (r.left + r.width / 2);
+      const dy = e.clientY - (r.top + r.height / 2);
+      el.style.transform = `translate(${(dx * strength).toFixed(1)}px, ${(
+        dy * strength
+      ).toFixed(1)}px)`;
+    };
+    const onLeave = () => {
+      el.style.transform = "translate(0, 0)";
+    };
+    el.addEventListener("mousemove", onMove);
+    el.addEventListener("mouseleave", onLeave);
+    return () => {
+      el.removeEventListener("mousemove", onMove);
+      el.removeEventListener("mouseleave", onLeave);
+    };
+  }, [strength]);
+
+  return (
+    <div className="magnetic" ref={ref}>
+      {children}
+    </div>
+  );
+}
+
 /* ── Hero socials ──────────────────────────────────────── */
 
-function HeroSocials() {
+function HeroSocials({
+  contact,
+}: {
+  contact: {
+    githubUrl: string;
+    linkedinUrl: string;
+    email: string;
+  };
+}) {
   return (
     <div className="hero-socials">
-      <a
-        href="https://github.com/fajarpancas"
-        target="_blank"
-        rel="noreferrer"
-        aria-label="GitHub"
-        title="GitHub"
-      >
-        <GitHubIcon />
-      </a>
-      <a
-        href="https://www.linkedin.com/in/fajarpancasaputra/"
-        target="_blank"
-        rel="noreferrer"
-        aria-label="LinkedIn"
-        title="LinkedIn"
-      >
-        <LinkedInIcon />
-      </a>
-      <a
-        href="mailto:fajarpancasaputra@gmail.com"
-        aria-label="Email"
-        title="Email"
-      >
-        <MailIcon />
-      </a>
+      <Magnetic strength={0.18}>
+        <a
+          href={contact.githubUrl}
+          target="_blank"
+          rel="noreferrer"
+          aria-label="GitHub"
+          title="GitHub"
+        >
+          <GitHubIcon />
+        </a>
+      </Magnetic>
+      <Magnetic strength={0.18}>
+        <a
+          href={contact.linkedinUrl}
+          target="_blank"
+          rel="noreferrer"
+          aria-label="LinkedIn"
+          title="LinkedIn"
+        >
+          <LinkedInIcon />
+        </a>
+      </Magnetic>
+      <Magnetic strength={0.18}>
+        <a
+          href={`mailto:${contact.email}`}
+          aria-label="Email"
+          title="Email"
+        >
+          <MailIcon />
+        </a>
+      </Magnetic>
     </div>
+  );
+}
+
+/* ── Copy email ────────────────────────────────────────── */
+
+function CopyEmail({ email }: { email: string }) {
+  const [copied, setCopied] = useState(false);
+
+  const copy = async () => {
+    try {
+      await navigator.clipboard.writeText(email);
+    } catch {
+      const ta = document.createElement("textarea");
+      ta.value = email;
+      ta.style.position = "fixed";
+      ta.style.opacity = "0";
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand("copy");
+      ta.remove();
+    }
+    setCopied(true);
+    window.setTimeout(() => setCopied(false), 2000);
+  };
+
+  return (
+    <button type="button" className="copy-email" onClick={copy}>
+      <span className="ci-icon">
+        <MailIcon />
+      </span>
+      <span className="ci-body">
+        <span className="ci-label">{copied ? "Copied!" : "Email"}</span>
+        <span className="ci-value">{email}</span>
+      </span>
+      <span className="copy-hint" aria-hidden="true">
+        {copied ? "✓" : "Copy"}
+      </span>
+    </button>
   );
 }
 
@@ -459,6 +504,7 @@ function Typewriter({ words }: { words: string[] }) {
   const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
+    if (words.length === 0) return;
     const word = words[index % words.length];
 
     if (!deleting && text === word) {
@@ -491,17 +537,8 @@ function Typewriter({ words }: { words: string[] }) {
 
 /* ── Count-up stat ─────────────────────────────────────── */
 
-function Stat({
-  value,
-  suffix = "",
-  label,
-  sub,
-}: {
-  value: number;
-  suffix?: string;
-  label: string;
-  sub?: string;
-}) {
+function Stat(props: StatData) {
+  const { value, suffix = "", label, sub } = props;
   const ref = useRef<HTMLDivElement>(null);
   const [started, setStarted] = useState(false);
   const [n, setN] = useState(0);
@@ -553,21 +590,7 @@ function Stat({
 
 /* ── Skills marquee ────────────────────────────────────── */
 
-function SkillsMarquee() {
-  const skills = [
-    "React Native",
-    "TypeScript",
-    "JavaScript",
-    "Redux",
-    "Redux Saga",
-    "Zustand",
-    "Android Kotlin",
-    "iOS Swift",
-    "Firebase",
-    "REST API",
-    "Git",
-    "Agile",
-  ];
+function SkillsMarquee({ skills }: { skills: string[] }) {
   return (
     <div className="marquee" aria-hidden="true">
       <div className="marquee-track">
@@ -587,14 +610,14 @@ function SkillsMarquee() {
 
 /* ── Contact form ──────────────────────────────────────── */
 
-function ContactForm() {
+function ContactForm({ email }: { email: string }) {
   const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const fd = new FormData(e.currentTarget);
     const name = String(fd.get("name") || "").trim();
     const subject = String(fd.get("subject") || "").trim();
     const message = String(fd.get("message") || "").trim();
-    const to = "fajarpancasaputra@gmail.com";
+    const to = email;
     const mailSubject = subject || `New message from ${name || "Visitor"}`;
     const body = [`Name: ${name}`, ``, message].join("\n");
     const href = `mailto:${to}?subject=${encodeURIComponent(mailSubject)}&body=${encodeURIComponent(body)}`;
@@ -650,190 +673,54 @@ function ContactForm() {
 
 /* ── Projects carousel ─────────────────────────────────── */
 
-function ProjectsCarousel() {
-  const data = [
-    {
-      title: "JIFF Customer",
-      desc: "A consumer super app that combines a marketplace with on‑demand express delivery.",
-      img: "/jiff-customer.png",
-      tags: ["React Native", "TypeScript", "Marketplace", "Real-time"],
-      appStore:
-        "https://apps.apple.com/us/app/jiff-express-shopping/id6749932038",
-      playStore:
-        "https://play.google.com/store/apps/details?id=com.jiffcustomer.app",
-    },
-    {
-      title: "JIFF Agent",
-      desc: "A field‑operations super app supporting four roles: Merchant, Storage, Rider, and Reseller agents.",
-      img: "/jiff-agent.png",
-      tags: ["React Native", "TypeScript", "Roles & Permissions"],
-      appStore:
-        "https://apps.apple.com/us/app/jiff-agent-partners-app/id6749932298",
-      playStore:
-        "https://play.google.com/store/apps/details?id=com.jiffagent.app",
-    },
-    {
-      title: "KohBus Driver",
-      desc: "A driver app with turn‑by‑turn navigation across scheduled routes and waypoints, plus in‑app messaging with riders on the same route.",
-      img: "/kohbus-driver.png",
-      tags: ["React Native", "Maps", "Navigation", "Real-time"],
-      appStore: "https://apps.apple.com/id/app/kohbus-driver/id6738333966?l=id",
-      playStore:
-        "https://play.google.com/store/apps/details?id=com.kohbus.driver.app.release",
-    },
-    {
-      title: "KohBus Rider",
-      desc: "A rider app for bus booking, live vehicle tracking, and in‑app chat with drivers.",
-      img: "/kohbus-rider.png",
-      tags: ["React Native", "Maps", "Booking", "Chat"],
-      appStore: "https://apps.apple.com/id/app/kohbus-rider/id6738334250?l=id",
-      playStore:
-        "https://play.google.com/store/apps/details?id=com.kohbus.rider.app.release",
-    },
-    {
-      title: "Madkhal",
-      desc: "An Islamic app with Qibla direction, prayer times (currently Malaysia & Singapore), and free/premium learning content via videos and documents.",
-      img: "/madkhal.png",
-      tags: ["React Native", "Offline", "Multimedia"],
-      appStore: "https://apps.apple.com/id/app/madkhal/id6479597417?l=id",
-      playStore:
-        "https://play.google.com/store/apps/details?id=com.elmadhkhalmobile.app",
-    },
-    {
-      title: "VirtualSpace",
-      desc: "Mobile based chat and project management application",
-      img: "/virtualspace.png",
-      tags: ["React Native", "Chat", "WebSocket", "Redux"],
-      appStore:
-        "https://apps.apple.com/id/app/virtualspace-work-smarter/id1513794884",
-      playStore:
-        "https://play.google.com/store/apps/details?id=me.virtualspirit.virtualspace",
-    },
-    {
-      title: "KoolBuddy",
-      desc: "A digital companion app for carbon‑conscious generation",
-      img: "/koolbuddy.png",
-      tags: ["React Native", "Gamification", "Tracking"],
-      appStore: "https://apps.apple.com/mn/app/kool-buddy/id6450994509",
-      playStore: "",
-    },
-    {
-      title: "Achiever Dream+",
-      desc: "Mobile based for chemistry practical examination in Singapore with an NEA‑approved Chemistry Practical Lab",
-      img: "/achiever-dream-plus.png",
-      tags: ["React Native", "Exam Platform", "Content"],
-      appStore:
-        "https://apps.apple.com/id/app/achievers-dream/id1662868706?l=id",
-      playStore:
-        "https://play.google.com/store/apps/details?id=com.achieversdream.app",
-    },
-    {
-      title: "Moirai MomCare",
-      desc: "Mobile based to assist every step of pregnancy journey",
-      img: "/momcare.png",
-      tags: ["React Native", "Health", "Reminders"],
-      appStore: "https://apps.apple.com/sg/app/moirai-momcare/id1663835824",
-      playStore:
-        "https://play.google.com/store/apps/details?id=com.momcare.app",
-    },
-    {
-      title: "Together Living",
-      desc: "Mobile base payment for room rental with features chat, store, reward.",
-      img: "/together-living.png",
-      tags: ["React Native", "Payments", "Chat", "Rewards"],
-      appStore: "https://apps.apple.com/us/app/together-living/id1583899658",
-      playStore:
-        "https://play.google.com/store/apps/details?id=com.togetherliving.app",
-    },
-    {
-      title: "Tzu‑Chi Volunteer Management",
-      desc: "Mobile based application volunteer management for Tzu‑Chi Malaysia",
-      img: "/tzu-chi-vms.png",
-      tags: ["React Native", "Volunteer Management", "Offline"],
-      appStore: "",
-      playStore: "",
-    },
-    {
-      title: "WhatsDoc",
-      desc: "Mobile based doctor‑to‑doctor and doctor‑to‑patient consultation via chat or video call",
-      img: "/whatsdoc.png",
-      tags: ["React Native", "Video Call", "Telehealth"],
-      appStore: "",
-      playStore: "",
-    },
-    {
-      title: "Duedi: The investor's toolkit",
-      desc: "Mobile based toolkits for investor, this app provide 12 free tools for investor",
-      img: "/duedi.png",
-      tags: ["React Native", "Finance", "Charts"],
-      appStore: "",
-      playStore: "",
-    },
-    {
-      title: "AntriQue Merchant Operator",
-      desc: "Mobile based queue used by the admin of the merchant to create new queue",
-      img: "/antrique-operator.png",
-      tags: ["React Native", "Queue", "Admin"],
-      appStore: "",
-      playStore: "",
-    },
-    {
-      title: "AntriQue KIOSK",
-      desc: "Mobile based queue thats connects to a Bluetooth thermal printer device for retrieval and printing the queue tickets",
-      img: "/antrique-kiosk.png",
-      tags: ["React Native", "Bluetooth", "Thermal Printing"],
-      appStore: "",
-      playStore: "",
-    },
-    {
-      title: "AntriQue Customer",
-      desc: "Mobile based queue used by user for queue retrieval and monitoring",
-      img: "/antrique-customer.png",
-      tags: ["React Native", "Queue", "Real-time"],
-      appStore: "",
-      playStore: "",
-    },
-  ];
-
+function ProjectsCarousel({ projects }: { projects: Project[] }) {
   const trackRef = useRef<HTMLDivElement>(null);
   const [active, setActive] = useState(0);
+
+  // Distance one press of prev/next should move: the actual slide width
+  // (one column) plus the track gap — NOT a fraction of the viewport,
+  // which skipped slides on wide screens where two are visible at once.
+  const stepWidth = () => {
+    const el = trackRef.current;
+    if (!el) return 0;
+    const first = el.querySelector<HTMLElement>(".slide");
+    if (!first) return el.clientWidth;
+    const gap = parseFloat(getComputedStyle(el).columnGap) || 16;
+    return first.offsetWidth + gap;
+  };
 
   useEffect(() => {
     const el = trackRef.current;
     if (!el) return;
     const onScroll = () => {
-      const w = el.clientWidth;
-      const i = Math.round(el.scrollLeft / (w * 0.8));
-      setActive(Math.max(0, Math.min(i, data.length - 1)));
+      const step = stepWidth();
+      if (!step) return;
+      const i = Math.round(el.scrollLeft / step);
+      setActive(Math.max(0, Math.min(i, projects.length - 1)));
     };
     el.addEventListener("scroll", onScroll, { passive: true });
     return () => el.removeEventListener("scroll", onScroll);
-  }, [data.length]);
+  }, [projects.length]);
 
   const scrollToIndex = (i: number) => {
     const el = trackRef.current;
     if (!el) return;
-    const slideWidth = el.clientWidth * 0.8;
-    el.scrollTo({ left: i * (slideWidth + 16), behavior: "smooth" });
+    const step = stepWidth();
+    if (!step) return;
+    el.scrollTo({ left: i * step, behavior: "smooth" });
     setActive(i);
   };
   const prev = () => scrollToIndex(Math.max(0, active - 1));
-  const next = () => scrollToIndex(Math.min(data.length - 1, active + 1));
+  const next = () => scrollToIndex(Math.min(projects.length - 1, active + 1));
 
   return (
     <Reveal delay={120}>
       <div className="carousel">
         <div className="carousel-track" ref={trackRef}>
-          {data.map((p, i) => (
-            <article className="slide" key={i}>
+          {projects.map((p, i) => (
+            <article className="slide" key={`${p.title}-${i}`}>
               <div className="header-image">
-                <img
-                  src={p.img}
-                  alt={p.title}
-                  onError={(e) => {
-                    (e.currentTarget as HTMLImageElement).style.display = "none";
-                  }}
-                />
+                <ProjectImage src={p.img} alt={p.title} />
                 <div className="slide-img-overlay" />
               </div>
               <div className="slide-body">
@@ -876,17 +763,17 @@ function ProjectsCarousel() {
             <div className="carousel-counter">
               <span className="carousel-current">{String(active + 1).padStart(2, "0")}</span>
               <span className="carousel-sep"> / </span>
-              <span className="carousel-total">{String(data.length).padStart(2, "0")}</span>
+              <span className="carousel-total">{String(projects.length).padStart(2, "0")}</span>
             </div>
             <div className="carousel-bar">
               <div
                 className="carousel-bar-fill"
-                style={{ width: `${((active + 1) / data.length) * 100}%` }}
+                style={{ width: `${((active + 1) / projects.length) * 100}%` }}
               />
             </div>
           </div>
 
-          <button className="car-btn" onClick={next} aria-label="Next" disabled={active === data.length - 1}>
+          <button className="car-btn" onClick={next} aria-label="Next" disabled={active === projects.length - 1}>
             <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
           </button>
         </div>

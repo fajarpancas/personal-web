@@ -1,0 +1,24 @@
+rules_version = '2';
+
+// NOTE: Deploy these rules from the Firebase console (Storage → Rules).
+// The admin panel uploads screenshots to `/screenshots/` and profile images
+// to `/profile/`. Visitors need READ access so the images show on the site;
+// WRITE is restricted to authenticated users (the app currently runs
+// unauthenticated, so in the console choose "test mode" until you add auth).
+
+service firebase.storage {
+  match /b/{bucket}/o {
+    match /screenshots/{file} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+    match /profile/{file} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+    // Deny everything else by default
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}
