@@ -3,6 +3,8 @@ export interface Project {
   desc: string;
   img: string;
   tags: string[];
+  /** Client's country, shown as a flag badge on the card (e.g. "Indonesia"). */
+  clientCountry?: string;
   appStore: string;
   playStore: string;
 }
@@ -48,6 +50,8 @@ export interface PortfolioContent {
   experiences: Experience[];
   projectsEyebrow: string;
   projectsTitle: string;
+  /** Countries the clients are from, shown as a strip under the Projects heading. */
+  clientsCountries: string[];
   projects: Project[];
   contact: {
     eyebrow: string;
@@ -137,6 +141,7 @@ export const DEFAULT_CONTENT: PortfolioContent = {
   ],
   projectsEyebrow: "02 · Portfolio",
   projectsTitle: "Projects",
+  clientsCountries: ["Indonesia", "Singapore", "China", "Malaysia"],
   projects: [
     {
       title: "JIFF Customer",

@@ -611,6 +611,14 @@ function GeneralTab({
         <Field label="Teks footer" hint="Gunakan {year} untuk tahun berjalan">
           <TextInput value={draft.footer} onChange={(v) => patch({ footer: v })} />
         </Field>
+        <Field label="Negara klien" hint="Pisahkan dengan koma. Tampil di bawah judul Projects (contoh: Indonesia, Singapore, China, Malaysia)">
+          <TextInput
+            value={draft.clientsCountries.join(", ")}
+            onChange={(v) =>
+              patch({ clientsCountries: v.split(",").map((s) => s.trim()).filter(Boolean) })
+            }
+          />
+        </Field>
       </div>
     </SectionCard>
   );
@@ -883,10 +891,13 @@ function ProjectsTab({
                 <Field label="Deskripsi">
                   <TextArea value={p.desc} onChange={(v) => setProject(i, { desc: v })} />
                 </Field>
-                <Field label="Tags">
-                  <TagsInput value={p.tags} onChange={(tags) => setProject(i, { tags })} />
-                </Field>
-                <Field label="Link App Store" hint="kosongkan jika tidak ada">
+        <Field label="Tags">
+          <TagsInput value={p.tags} onChange={(tags) => setProject(i, { tags })} />
+        </Field>
+        <Field label="Negara klien" hint="Contoh: Indonesia, Singapore, China, Malaysia. Tampil sebagai badge bendera di kartu.">
+          <TextInput value={p.clientCountry || ""} onChange={(v) => setProject(i, { clientCountry: v.trim() })} />
+        </Field>
+        <Field label="Link App Store" hint="kosongkan jika tidak ada">
                   <TextInput value={p.appStore} onChange={(v) => setProject(i, { appStore: v })} />
                 </Field>
                 <Field label="Link Google Play" hint="kosongkan jika tidak ada">

@@ -152,6 +152,20 @@ export default function OnePage() {
             <p className="section-eyebrow">{content.projectsEyebrow}</p>
             <h1>{content.projectsTitle}</h1>
           </Reveal>
+          {content.clientsCountries?.length > 0 && (
+            <Reveal delay={60}>
+              <div className="clients-strip">
+                <span className="clients-strip-label">
+                  🌏 Klien dari {content.clientsCountries.length} negara
+                </span>
+                {content.clientsCountries.map((c) => (
+                  <span className="clients-chip" key={c}>
+                    {flagOf(c)} {c}
+                  </span>
+                ))}
+              </div>
+            </Reveal>
+          )}
           <ProjectsCarousel projects={projects} />
         </div>
       </section>
@@ -246,6 +260,28 @@ export default function OnePage() {
       </footer>
     </div>
   );
+}
+
+/* ── Client country flags ─────────────────────────────── */
+
+const COUNTRY_FLAGS: Record<string, string> = {
+  Indonesia: "🇮🇩",
+  Singapore: "🇸🇬",
+  China: "🇨🇳",
+  Malaysia: "🇲🇾",
+  India: "🇮🇳",
+  Vietnam: "🇻🇳",
+  Thailand: "🇹🇭",
+  Philippines: "🇵🇭",
+  Japan: "🇯🇵",
+  "South Korea": "🇰🇷",
+  "United States": "🇺🇸",
+  Australia: "🇦🇺",
+  "United Kingdom": "🇬🇧",
+};
+
+function flagOf(country: string) {
+  return COUNTRY_FLAGS[country] || "🌏";
 }
 
 /* ── Project image with graceful fallback ──────────────── */
@@ -726,6 +762,9 @@ function ProjectsCarousel({ projects }: { projects: Project[] }) {
               <div className="slide-body">
                 <h3 className="slide-title">{p.title}</h3>
                 <p className="slide-desc">{p.desc}</p>
+                {p.clientCountry && (
+                  <span className="slide-country">{flagOf(p.clientCountry)} {p.clientCountry}</span>
+                )}
                 <div className="slide-tags">
                   {p.tags.map((t) => (
                     <span className="tag" key={t}>
