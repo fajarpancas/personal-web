@@ -16,14 +16,21 @@ export default function App() {
   const path = location.pathname.replace(/\/+$/, "").toLowerCase();
   const hideNav = path.startsWith("/qris") || path === "/add-address" || path === "/list-address" || path === "/admin";
   const noSnap = path === "/add-address" || path === "/list-address" || path === "/admin";
+  const folio = !hideNav;
+
+  useEffect(() => {
+    document.body.classList.toggle("is-folio", folio);
+    return () => document.body.classList.remove("is-folio");
+  }, [folio]);
+
   return (
     <>
       <ScrollOnRouteChange />
       <ScrollToHash />
-      <ScrollProgress />
+      {!folio && <ScrollProgress />}
       {!hideNav && <NavBar />}
-      <div className="aurora" aria-hidden="true" />
-      <main className={noSnap ? "" : "snap"}>
+      {!folio && <div className="aurora" aria-hidden="true" />}
+      <main className={!folio && !noSnap ? "snap" : ""}>
         <Routes>
           <Route path="/" element={<OnePage />} />
           <Route path="/QRIS" element={<QRIS />} />
@@ -33,8 +40,8 @@ export default function App() {
         </Routes>
       </main>
       <ScrollToTopButton />
-      <CursorGlow />
-      <div className="grain" aria-hidden="true" />
+      {!folio && <CursorGlow />}
+      {!folio && <div className="grain" aria-hidden="true" />}
     </>
   );
 }

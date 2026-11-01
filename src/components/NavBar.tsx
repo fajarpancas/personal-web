@@ -7,7 +7,7 @@ export default function NavBar() {
 
   // Scroll spy: highlight the nav link of the section in view
   useEffect(() => {
-    const ids = ["home", "about", "projects", "contact"];
+    const ids = ["home", "apps", "projects", "about", "contact"];
     const onScroll = () => {
       const pos = getScrollY() + 140;
       let current = "home";
@@ -59,7 +59,7 @@ export default function NavBar() {
             <svg width="24" height="24" viewBox="0 0 24 24">
               <path
                 d="M6 6L18 18M6 18L18 6"
-                stroke="white"
+                stroke="currentColor"
                 strokeWidth="2"
                 strokeLinecap="round"
               />
@@ -69,7 +69,7 @@ export default function NavBar() {
             <svg width="24" height="24" viewBox="0 0 24 24">
               <path
                 d="M4 6H20M4 12H20M4 18H20"
-                stroke="white"
+                stroke="currentColor"
                 strokeWidth="2"
                 strokeLinecap="round"
               />
@@ -80,6 +80,18 @@ export default function NavBar() {
         <ul className="nav desktop">
           <li>
             <a
+              href="/#apps"
+              className={active === "apps" || active === "projects" ? "active" : ""}
+              onClick={(e) => {
+                e.preventDefault();
+                scrollTo("#apps");
+              }}
+            >
+              Apps
+            </a>
+          </li>
+          <li>
+            <a
               href="/#about"
               className={active === "about" ? "active" : ""}
               onClick={(e) => {
@@ -87,31 +99,19 @@ export default function NavBar() {
                 scrollTo("#about");
               }}
             >
-              Work Experiences
-            </a>
-          </li>
-          <li>
-            <a
-              href="/#projects"
-              className={active === "projects" ? "active" : ""}
-              onClick={(e) => {
-                e.preventDefault();
-                scrollTo("#projects");
-              }}
-            >
-              Projects
+              Career
             </a>
           </li>
           <li>
             <a
               href="/#contact"
-              className={active === "contact" ? "active" : ""}
+              className={`nav-action ${active === "contact" ? "active" : ""}`}
               onClick={(e) => {
                 e.preventDefault();
                 scrollTo("#contact");
               }}
             >
-              Contact
+              Write Him
             </a>
           </li>
         </ul>
@@ -121,6 +121,19 @@ export default function NavBar() {
         <ul className="mobile-nav">
           <li>
             <a
+              href="/#apps"
+              className={active === "apps" || active === "projects" ? "active" : ""}
+              onClick={(e) => {
+                e.preventDefault();
+                scrollTo("#apps");
+                setOpen(false);
+              }}
+            >
+              Apps
+            </a>
+          </li>
+          <li>
+            <a
               href="/#about"
               className={active === "about" ? "active" : ""}
               onClick={(e) => {
@@ -129,20 +142,7 @@ export default function NavBar() {
                 setOpen(false);
               }}
             >
-              Work Experiences
-            </a>
-          </li>
-          <li>
-            <a
-              href="/#projects"
-              className={active === "projects" ? "active" : ""}
-              onClick={(e) => {
-                e.preventDefault();
-                scrollTo("#projects");
-                setOpen(false);
-              }}
-            >
-              Projects
+              Career
             </a>
           </li>
           <li>
@@ -155,7 +155,7 @@ export default function NavBar() {
                 setOpen(false);
               }}
             >
-              Contact
+              Write Him
             </a>
           </li>
         </ul>

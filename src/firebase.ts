@@ -1,7 +1,7 @@
 import { initializeApp } from "firebase/app";
 import { getFirestore } from "firebase/firestore";
 import { getStorage } from "firebase/storage";
-import { getAuth } from "firebase/auth";
+import { getAuth, type Auth } from "firebase/auth";
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
@@ -15,4 +15,13 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 export const db = getFirestore(app);
 export const storage = getStorage(app);
-export const auth = getAuth(app);
+
+/** Auth throws immediately when VITE_FIREBASE_* is missing. Keep the rest of the site up. */
+export const auth: Auth | null = (() => {
+  try {
+    return getAuth(app);
+  } catch (err) {
+    console.warn("Firebase Auth is not configured. Add VITE_FIREBASE_* to a .env file.", err);
+    return null;
+  }
+})();

@@ -31,6 +31,10 @@ export default function Admin() {
 
   // Track Firebase Auth session (persists across refreshes automatically)
   useEffect(() => {
+    if (!auth) {
+      setAuthReady(true);
+      return;
+    }
     const unsub = onAuthStateChanged(auth, (u) => {
       setUser(u);
       setAuthReady(true);
@@ -39,6 +43,7 @@ export default function Admin() {
   }, []);
 
   const handleLogout = async () => {
+    if (!auth) return;
     try {
       await signOut(auth);
     } catch {
@@ -319,6 +324,14 @@ function AuthGate() {
     e.preventDefault();
     setBusy(true);
     setError(null);
+    if (!auth) {
+      setBusy(false);
+      setError({
+        kind: "warn",
+        text: "Firebase belum dikonfigurasi. Tambahkan VITE_FIREBASE_* di file .env, lalu jalankan ulang.",
+      });
+      return;
+    }
     try {
       await signInWithEmailAndPassword(auth, email.trim(), password);
     } catch (err) {

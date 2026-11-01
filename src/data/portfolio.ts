@@ -70,8 +70,8 @@ export const DEFAULT_CONTENT: PortfolioContent = {
   hero: {
     name: "Fajar Panca",
     roles: ["Frontend Developer", "React Native Developer", "Mobile Engineer"],
-    bio: "6+ years building mobile apps people actually use — 17+ apps shipped on the App Store and Google Play.",
-    cta: "See My Work →",
+    bio: "React Native developer in Indonesia. Seventeen apps on the App Store and Google Play.",
+    cta: "See the apps",
     floatBadge: { icon: "🚀", value: "17+", label: "apps shipped" },
     profileImg: "/profile.png",
   },
@@ -97,7 +97,7 @@ export const DEFAULT_CONTENT: PortfolioContent = {
   ],
   about: {
     eyebrow: "01 · Career",
-    title: "Work Experiences",
+    title: "The studios",
     intro:
       "Frontend Developer focused on React Native across full-time and part-time roles since 2019, delivering mobile apps while balancing concurrent engagements.",
   },
@@ -106,7 +106,7 @@ export const DEFAULT_CONTENT: PortfolioContent = {
       company: "VirtualSpirit",
       initial: "VS",
       badge: "11 apps",
-      desc: "Mobile app studio building products across logistics, fintech, and productivity — spanning React Native, TypeScript, and real-time features.",
+      desc: "Mobile app studio building products across logistics, fintech, and productivity, spanning React Native, TypeScript, and real-time features.",
       roles: [
         { type: "Full-time", period: "Dec 2019 – Nov 2022" },
         { type: "Part-time", period: "Nov 2022 – Nov 2023" },
@@ -140,7 +140,7 @@ export const DEFAULT_CONTENT: PortfolioContent = {
     },
   ],
   projectsEyebrow: "02 · Portfolio",
-  projectsTitle: "Projects",
+  projectsTitle: "Shipped apps",
   clientsCountries: ["Indonesia", "Singapore", "China", "Malaysia"],
   projects: [
     {
@@ -274,14 +274,14 @@ export const DEFAULT_CONTENT: PortfolioContent = {
   ],
   contact: {
     eyebrow: "03 · Contact",
-    title: "Let's Connect",
+    title: "Write him",
     intro:
-      "Have a project idea or just want to chat? I'd love to hear from you — my inbox is always open.",
+      "A mobile app, a contract, or a question. The note opens in your mail app.",
     email: "fajarpancasaputra@gmail.com",
     linkedinUrl: "https://www.linkedin.com/in/fajarpancasaputra/",
     linkedinHandle: "in/fajarpancasaputra",
     githubUrl: "https://github.com/fajarpancas",
     githubHandle: "@fajarpancas",
   },
-  footer: "© {year} Fajar Panca · crafted with ♥ in Indonesia",
+  footer: "© {year} Fajar Panca, Indonesia",
 };
