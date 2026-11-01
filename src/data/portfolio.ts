@@ -70,14 +70,14 @@ export const DEFAULT_CONTENT: PortfolioContent = {
   hero: {
     name: "Fajar Panca",
     roles: ["Frontend Developer", "React Native Developer", "Mobile Engineer"],
-    bio: "React Native developer in Indonesia. Seventeen apps on the App Store and Google Play.",
+    bio: "React Native developer in Indonesia. Nineteen apps on the App Store and Google Play.",
     cta: "See the apps",
-    floatBadge: { icon: "🚀", value: "17+", label: "apps shipped" },
+    floatBadge: { icon: "🚀", value: "19+", label: "apps shipped" },
     profileImg: "/profile.png",
   },
   stats: [
     { value: 6, suffix: "+", label: "Years Experience" },
-    { value: 17, suffix: "+", label: "Apps Shipped" },
+    { value: 19, suffix: "+", label: "Apps Shipped" },
     { value: 4, label: "Companies" },
     { value: 2, label: "Platforms", sub: "iOS & Android" },
   ],
@@ -105,7 +105,7 @@ export const DEFAULT_CONTENT: PortfolioContent = {
     {
       company: "VirtualSpirit",
       initial: "VS",
-      badge: "11 apps",
+      badge: "13 apps",
       desc: "Mobile app studio building products across logistics, fintech, and productivity, spanning React Native, TypeScript, and real-time features.",
       roles: [
         { type: "Full-time", period: "Dec 2019 – Nov 2022" },
@@ -270,6 +270,24 @@ export const DEFAULT_CONTENT: PortfolioContent = {
       tags: ["React Native", "Queue", "Real-time"],
       appStore: "",
       playStore: "",
+    },
+    {
+      title: "Medimate Malaysia",
+      desc: "Medimate Malaysia helps individuals and families arrange trusted, non-medical companion support for hospital and clinic appointments.",
+      img: "/medimate-malaysia.png",
+      tags: ["React Native", "Companion", "Malaysia"],
+      clientCountry: "Malaysia",
+      appStore: "https://apps.apple.com/us/app/medimate-malaysia/id6812279991",
+      playStore: "https://play.google.com/store/apps/details?id=my.medimate.patient",
+    },
+    {
+      title: "Medimate Companion Malaysia",
+      desc: "Companions accompany users during medical appointments, help with hospital and clinic navigation, registration and paperwork, wait through the visit, give non-medical practical and emotional support, and send progress updates to authorised family members.",
+      img: "/medimate-companion.png",
+      tags: ["React Native", "Companion", "Appointments"],
+      clientCountry: "Malaysia",
+      appStore: "https://apps.apple.com/us/app/medimate-malaysia-companion/id6812143842",
+      playStore: "https://play.google.com/store/apps/details?id=my.medimate.companion",
     },
   ],
   contact: {

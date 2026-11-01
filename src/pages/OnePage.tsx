@@ -67,16 +67,28 @@ function onSectionClick(event: React.MouseEvent<HTMLAnchorElement>, id: string) 
 
 export default function OnePage() {
   const { content, loading } = usePortfolioContent();
+  const [holdSkeleton, setHoldSkeleton] = useState(true);
   const { hero, stats, about, experiences, contact, projects, footer } = content;
   const years = stats.find((s) => /year/i.test(s.label));
   const year = new Date().getFullYear();
+
+  useEffect(() => {
+    if (!loading) {
+      setHoldSkeleton(false);
+      return;
+    }
+    const timer = window.setTimeout(() => setHoldSkeleton(false), 1200);
+    return () => window.clearTimeout(timer);
+  }, [loading]);
+
+  if (loading && holdSkeleton) return <PageSkeleton />;
 
   return (
     <div className="fc">
       <section className="fc-hero" id="home">
         <div className="fc-hero-copy">
           <BinarySlide />
-          <h1>Seventeen Apps, Both Stores</h1>
+          <h1>Nineteen Apps, Both Stores</h1>
           <p className="fc-lede">{plain(hero.bio)}</p>
           <p className="fc-quiet">
             {years ? `${years.value}${years.suffix || ""} years` : "Since 2019"} in Indonesia, on iOS and Android.
@@ -496,6 +508,44 @@ function AppSlider({ projects, loading, title }: { projects: Project[]; loading:
         </div>
       ) : null}
     </section>
+  );
+}
+
+function Bone({ className }: { className?: string }) {
+  return <span className={className ? `fc-bone ${className}` : "fc-bone"} />;
+}
+
+function PageSkeleton() {
+  return (
+    <div className="fc fc-skeleton" aria-busy="true">
+      <p className="fc-sr">Loading the page</p>
+      <section className="fc-hero" aria-hidden="true">
+        <div className="fc-hero-copy">
+          <Bone className="fc-bone-binary" />
+          <Bone className="fc-bone-title" />
+          <Bone className="fc-bone-title is-short" />
+          <Bone className="fc-bone-line" />
+          <Bone className="fc-bone-line is-short" />
+          <Bone className="fc-bone-quiet" />
+          <div className="fc-actions">
+            <Bone className="fc-bone-btn" />
+            <Bone className="fc-bone-btn" />
+          </div>
+        </div>
+        <Bone className="fc-bone-portrait" />
+      </section>
+      <section className="fc-block" aria-hidden="true">
+        <header className="fc-block-head">
+          <Bone className="fc-bone-h2" />
+          <Bone className="fc-bone-quiet" />
+        </header>
+        <div className="fc-bone-rail">
+          {Array.from({ length: 5 }, (_, index) => (
+            <Bone className="fc-bone-phone" key={index} />
+          ))}
+        </div>
+      </section>
+    </div>
   );
 }
 

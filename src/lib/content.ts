@@ -22,6 +22,14 @@ export function deepMerge<T>(base: T, override: unknown): T {
   return (override === undefined ? base : override) as T;
 }
 
+/** Saved project lists replace the default list. Keep apps added in code since that save. */
+function withNewProjects(merged: PortfolioContent): PortfolioContent {
+  const titles = new Set(merged.projects.map((project) => project.title));
+  const added = DEFAULT_CONTENT.projects.filter((project) => !titles.has(project.title));
+  if (added.length === 0) return merged;
+  return { ...merged, projects: [...merged.projects, ...added] };
+}
+
 async function loadFromDb(): Promise<PortfolioContent | null> {
   try {
     const ref = doc(db, "content", CONTENT_DOC_ID);
@@ -89,11 +97,11 @@ export function usePortfolioContent() {
       const remote = await loadFromDb();
       if (cancelled) return;
       if (remote) {
-        setContent(deepMerge(DEFAULT_CONTENT, remote));
+        setContent(withNewProjects(deepMerge(DEFAULT_CONTENT, remote)));
         setOnline(true);
       } else {
         const local = loadFromLocal();
-        if (local) setContent(deepMerge(DEFAULT_CONTENT, local));
+        if (local) setContent(withNewProjects(deepMerge(DEFAULT_CONTENT, local)));
       }
       setLoading(false);
     })();
@@ -103,7 +111,7 @@ export function usePortfolioContent() {
   }, []);
 
   const save = useCallback(async (next: PortfolioContent): Promise<SaveResult> => {
-    const merged = deepMerge(DEFAULT_CONTENT, next);
+    const merged = withNewProjects(deepMerge(DEFAULT_CONTENT, next));
     const result = await saveToDb(merged);
     setContent(merged);
     setOnline(result.online);

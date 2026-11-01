@@ -11,10 +11,27 @@
       href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400..500&family=Geist+Mono:wght@400;500&family=Roboto+Mono:wght@400;500&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Sora:wght@500;600;700;800&display=swap"
       rel="stylesheet"
     />
-    <script>document.documentElement.classList.add("js")</script>
+    <style>
+      html, body, #root { margin: 0; background: #f9f9f9; }
+      @media (prefers-color-scheme: dark) {
+        html, body, #root { background: #0a0a0a; }
+      }
+    </style>
     <meta name="theme-color" content="#f9f9f9" />
+    <script>
+      document.documentElement.classList.add("js");
+      var theme = document.querySelector('meta[name="theme-color"]');
+      if (theme && matchMedia("(prefers-color-scheme: dark)").matches) theme.setAttribute("content", "#0a0a0a");
+    </script>
   </head>
   <body>
+    <script>
+      (function () {
+        var path = location.pathname.replace(/\/+$/, "").toLowerCase();
+        var other = path.indexOf("/qris") === 0 || path === "/add-address" || path === "/list-address" || path === "/admin";
+        if (!other) document.body.classList.add("is-folio");
+      })();
+    </script>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
