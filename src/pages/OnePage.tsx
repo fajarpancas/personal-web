@@ -5,11 +5,11 @@ import type { Experience, Project } from "../data/portfolio";
 import { getScrollY } from "../utils/scroll";
 
 function plain(value: string) {
-  return value.replaceAll("—", ", ");
+  return value.replace(/—/g, ", ");
 }
 
 function label(value: string) {
-  return plain(value).replace(/\b[a-z]/g, (letter) => letter.toUpperCase());
+  return plain(value).replace(/\b[a-z]/g, (letter: string) => letter.toUpperCase());
 }
 
 const BINARY_LINE =
