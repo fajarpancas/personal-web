@@ -218,7 +218,7 @@ function AppSlider({ projects, loading, title }: { projects: Project[]; loading:
   const draggingRef = useRef(false);
   const dragX = useRef(0);
   const holding = useRef(false);
-  const flight = useRef<{ stop: () => void } | null>(null);
+  const flight = useRef<{ stop: () => void; finished: Promise<unknown> } | null>(null);
   const posRef = useRef(pos);
   const countRef = useRef(count);
   const x = useMotionValue(0);
@@ -236,16 +236,16 @@ function AppSlider({ projects, loading, title }: { projects: Project[]; loading:
     return -(slide.offsetLeft - (rail.clientWidth - slide.offsetWidth) / 2);
   };
 
-  const loopSpan = () => {
+  const span = () => {
     const total = countRef.current;
     if (total < 2) return 0;
-    const start = measure(total);
-    const nextCopy = measure(total * 2);
-    if (start == null || nextCopy == null) return 0;
-    return start - nextCopy;
+    const first = measure(total);
+    const third = measure(total * 2);
+    if (first == null || third == null) return 0;
+    return first - third;
   };
 
-  const closest = () => {
+  const nearest = () => {
     const rail = railRef.current;
     if (!rail) return posRef.current;
     const mid = rail.getBoundingClientRect().left + rail.clientWidth / 2;
@@ -253,8 +253,8 @@ function AppSlider({ projects, loading, title }: { projects: Project[]; loading:
     let bestDist = Infinity;
     slides.current.forEach((slide, index) => {
       if (!slide) return;
-      const box = slide.getBoundingClientRect();
-      const dist = Math.abs(box.left + box.width / 2 - mid);
+      const rect = slide.getBoundingClientRect();
+      const dist = Math.abs(rect.left + rect.width / 2 - mid);
       if (dist < bestDist) {
         bestDist = dist;
         best = index;
@@ -264,50 +264,48 @@ function AppSlider({ projects, loading, title }: { projects: Project[]; loading:
   };
 
   const wrapX = () => {
-    const total = countRef.current;
-    const span = loopSpan();
-    const origin = measure(total);
-    if (!(span > 0) || origin == null) return;
-    let nextX = x.get();
-    const edge = origin - span;
-    while (nextX <= edge) nextX += span;
-    while (nextX > origin) nextX -= span;
-    if (nextX !== x.get()) x.set(nextX);
+    const distance = span();
+    const origin = measure(countRef.current);
+    if (!(distance > 0) || origin == null) return;
+    let value = x.get();
+    const low = origin - distance;
+    while (value <= low) value += distance;
+    while (value > origin) value -= distance;
+    if (value !== x.get()) x.set(value);
   };
 
-  const playTo = (index: number, duration = 0.45) => {
+  const settle = (index: number, duration = 0.45) => {
     const total = countRef.current;
-    const maxIndex = Math.max(0, slides.current.length - 1);
-    let slot = index;
-    if (total > 1 && (slot < 0 || slot > maxIndex)) {
-      const span = loopSpan();
-      while (slot < 0) {
-        slot += total;
-        if (span > 0) x.set(x.get() - span);
+    const last = Math.max(0, slides.current.length - 1);
+    let next = index;
+    if (total > 1 && (next < 0 || next > last)) {
+      const distance = span();
+      while (next < 0) {
+        next += total;
+        if (distance > 0) x.set(x.get() - distance);
       }
-      while (slot > maxIndex) {
-        slot -= total;
-        if (span > 0) x.set(x.get() + span);
+      while (next > last) {
+        next -= total;
+        if (distance > 0) x.set(x.get() + distance);
       }
     }
-    slot = Math.max(0, Math.min(maxIndex, slot));
-    const target = measure(slot);
+    next = Math.max(0, Math.min(last, next));
+    const target = measure(next);
     if (target == null) return;
     flight.current?.stop();
-    posRef.current = slot;
-    setPos(slot);
+    posRef.current = next;
+    setPos(next);
     if (reduce) {
       x.set(target);
       return;
     }
     holding.current = true;
-    const controls = animate(x, target, { duration, ease: [0.22, 1, 0.36, 1] });
-    flight.current = controls;
-    void controls.finished.then(() => {
-      if (flight.current !== controls) return;
-      holding.current = false;
+    const anim = animate(x, target, { duration, ease: [0.22, 1, 0.36, 1] });
+    flight.current = anim;
+    void anim.finished.then(() => {
+      if (flight.current === anim) holding.current = false;
     }).catch(() => {
-      if (flight.current === controls) holding.current = false;
+      if (flight.current === anim) holding.current = false;
     });
   };
 
@@ -317,25 +315,25 @@ function AppSlider({ projects, loading, title }: { projects: Project[]; loading:
     const total = countRef.current;
     if (total < 2) return;
     wrapX();
-    const from = measure(total);
+    const origin = measure(total);
     const next = measure(total + 1);
-    if (from == null || next == null || next === from) {
-      playTo(closest());
+    if (origin == null || next == null || next === origin) {
+      settle(nearest());
       return;
     }
-    const step = next - from;
-    const coast = velocity * 520;
-    let delta = Math.round(coast / step);
-    const cap = total - 1;
-    delta = Math.max(-cap, Math.min(cap, delta));
-    const near = closest();
-    const distance = Math.abs(delta * step);
-    playTo(near + delta, Math.min(1.05, Math.max(0.34, distance / 1400)));
+    const width = next - origin;
+    const travel = velocity * 520;
+    let steps = Math.round(travel / width);
+    const limit = total - 1;
+    steps = Math.max(-limit, Math.min(limit, steps));
+    const closest = nearest();
+    const distance = Math.abs(steps * width);
+    settle(closest + steps, Math.min(1.05, Math.max(0.34, distance / 1400)));
   };
 
-  const go = (dir: 1 | -1) => {
+  const go = (delta: number) => {
     if (count < 2) return;
-    playTo(posRef.current + dir);
+    settle(posRef.current + delta);
   };
 
   useEffect(() => {
@@ -351,20 +349,19 @@ function AppSlider({ projects, loading, title }: { projects: Project[]; loading:
       last = now;
       if (!draggingRef.current) phase.set(phase.get() + dt * 0.0016);
       if (!draggingRef.current && !holding.current) {
-        const total = countRef.current;
-        const span = loopSpan();
-        const origin = measure(total);
-        let nextX = x.get() - (96 * dt) / 1000;
-        if (span > 0 && origin != null) {
-          const edge = origin - span;
-          while (nextX <= edge) nextX += span;
-          while (nextX > origin) nextX -= span;
+        const distance = span();
+        const origin = measure(countRef.current);
+        let value = x.get() - (96 * dt) / 1000;
+        if (distance > 0 && origin != null) {
+          const low = origin - distance;
+          while (value <= low) value += distance;
+          while (value > origin) value -= distance;
         }
-        x.set(nextX);
-        const nearest = closest();
-        if (nearest !== posRef.current) {
-          posRef.current = nearest;
-          setPos(nearest);
+        x.set(value);
+        const closest = nearest();
+        if (closest !== posRef.current) {
+          posRef.current = closest;
+          setPos(closest);
         }
       }
       frame = requestAnimationFrame(tick);

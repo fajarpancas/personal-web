@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { getScrollY } from "../utils/scroll";
+import ThemeToggle from "./ThemeToggle";
 
 export default function NavBar() {
   const [open, setOpen] = useState(false);
@@ -48,35 +49,7 @@ export default function NavBar() {
           Fajar Panca
         </a>
 
-        <button
-          className={`menu-btn ${open ? "open" : ""}`}
-          aria-label="Toggle menu"
-          aria-expanded={open}
-          onClick={() => setOpen((v) => !v)}
-        >
-          {open ? (
-            // Close Icon
-            <svg width="24" height="24" viewBox="0 0 24 24">
-              <path
-                d="M6 6L18 18M6 18L18 6"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-              />
-            </svg>
-          ) : (
-            // Hamburger Icon
-            <svg width="24" height="24" viewBox="0 0 24 24">
-              <path
-                d="M4 6H20M4 12H20M4 18H20"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-              />
-            </svg>
-          )}
-        </button>
-
+        <div className="nav-end">
         <ul className="nav desktop">
           <li>
             <a
@@ -115,6 +88,24 @@ export default function NavBar() {
             </a>
           </li>
         </ul>
+        <ThemeToggle />
+        <button
+          className={`menu-btn ${open ? "open" : ""}`}
+          aria-label="Toggle menu"
+          aria-expanded={open}
+          onClick={() => setOpen((v) => !v)}
+        >
+          {open ? (
+            <svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M6 6L18 18M6 18L18 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+            </svg>
+          ) : (
+            <svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M4 6H20M4 12H20M4 18H20" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+            </svg>
+          )}
+        </button>
+        </div>
       </nav>
 
       <div className={`mobile-menu ${open ? "show" : ""}`}>
