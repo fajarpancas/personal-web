@@ -12,7 +12,7 @@ function readTheme(): Theme {
 
 function paintTheme(theme: Theme) {
   document.documentElement.dataset.theme = theme;
-  document.querySelector('meta[name="theme-color"]')?.setAttribute("content", theme === "dark" ? "#0a0a0a" : "#f9f9f9");
+  document.querySelector('meta[name="theme-color"]')?.setAttribute("content", theme === "dark" ? "#0e100d" : "#f4f7ef");
   try {
     localStorage.setItem(STORAGE_KEY, theme);
   } catch {
@@ -77,7 +77,7 @@ export default function ThemeToggle() {
       if (stored === "light" || stored === "dark") return;
       const next: Theme = media.matches ? "dark" : "light";
       document.documentElement.dataset.theme = next;
-      document.querySelector('meta[name="theme-color"]')?.setAttribute("content", next === "dark" ? "#0a0a0a" : "#f9f9f9");
+      document.querySelector('meta[name="theme-color"]')?.setAttribute("content", next === "dark" ? "#0e100d" : "#f4f7ef");
       setTheme(next);
     };
     media.addEventListener("change", onChange);
@@ -98,7 +98,7 @@ export default function ThemeToggle() {
       className="theme-toggle"
       role="switch"
       aria-checked={dark}
-      aria-label="Dark appearance"
+      aria-label={dark ? "Switch to light mode" : "Switch to dark mode"}
       onClick={onToggle}
     >
       <span className="theme-toggle-thumb">

@@ -4,6 +4,7 @@ import { BrowserRouter } from 'react-router-dom'
 import App from './App'
 import './index.css'
 import './folio.css'
+import './tailwind.css'
 
 const container = document.getElementById('root')!
 const root = createRoot(container)

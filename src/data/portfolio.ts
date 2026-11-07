@@ -70,10 +70,10 @@ export const DEFAULT_CONTENT: PortfolioContent = {
   hero: {
     name: "Fajar Panca",
     roles: ["Frontend Developer", "React Native Developer", "Mobile Engineer"],
-    bio: "React Native developer in Indonesia. Nineteen apps on the App Store and Google Play.",
+    bio: "I'm Fajar Panca, a Mobile Engineer in Indonesia. Nineteen apps on the App Store and Google Play.",
     cta: "See the apps",
     floatBadge: { icon: "🚀", value: "19+", label: "apps shipped" },
-    profileImg: "/profile.png",
+    profileImg: "/portrait.png",
   },
   stats: [
     { value: 6, suffix: "+", label: "Years Experience" },
@@ -292,7 +292,7 @@ export const DEFAULT_CONTENT: PortfolioContent = {
   ],
   contact: {
     eyebrow: "03 · Contact",
-    title: "Write him",
+    title: "Write me",
     intro:
       "A mobile app, a contract, or a question. The note opens in your mail app.",
     email: "fajarpancasaputra@gmail.com",

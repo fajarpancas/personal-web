@@ -1,5 +1,6 @@
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
-import { animate, motion, useMotionValue, useReducedMotion, useTransform, type MotionValue } from "motion/react";
+import { useEffect, useRef, useState } from "react";
+import { animate, motion, useReducedMotion } from "motion/react";
+import { TestimonialsSection } from "../components/ui/testimonials-6";
 import { usePortfolioContent } from "../lib/content";
 import type { Experience, Project } from "../data/portfolio";
 import { getScrollY } from "../utils/scroll";
@@ -12,8 +13,25 @@ function label(value: string) {
   return plain(value).replace(/\b[a-z]/g, (letter: string) => letter.toUpperCase());
 }
 
-const BINARY_LINE =
-  "01000110 01100001 01101010 01100001 01110010 00100000 01010000 01100001 01101110 01100011 01100001 00100000 01010011 01100001 01110000 01110101 01110100 01110010 01100001 ";
+function voice(value: string) {
+  return label(value).replace(/\bHim\b/g, "Me");
+}
+
+function heroBio(bio: string, name: string) {
+  if (/^i['’]m\b/i.test(bio)) return plain(bio);
+  if (/react native developer/i.test(bio)) {
+    return `I'm ${name}, a Mobile Engineer in Indonesia. Nineteen apps on the App Store and Google Play.`;
+  }
+  return plain(bio);
+}
+
+const SELECTED = ["JIFF Customer", "KohBus Rider", "Madkhal"];
+
+const BLURB: Record<string, string> = {
+  "JIFF Customer": "Marketplace and on-demand delivery.",
+  "KohBus Rider": "Routes, live tracking, and chat.",
+  Madkhal: "Qibla, prayer times, and learning.",
+};
 
 let sectionScroll: { stop: () => void } | null = null;
 let releaseScroll: (() => void) | null = null;
@@ -22,7 +40,7 @@ function scrollToSection(id: string) {
   const el = document.getElementById(id);
   if (!el) return;
   const nav = document.querySelector(".navbar");
-  const offset = (nav?.getBoundingClientRect().height ?? 0) + 16;
+  const offset = (nav?.getBoundingClientRect().height ?? 0) + 8;
   const target = Math.max(0, el.getBoundingClientRect().top + getScrollY() - offset);
   const from = getScrollY();
   sectionScroll?.stop();
@@ -59,18 +77,187 @@ function scrollToSection(id: string) {
   });
 }
 
+const CHAPTERS = ["home", "apps", "about", "projects", "contact"] as const;
+type ChapterId = (typeof CHAPTERS)[number];
+
+const STEP_LABEL: Record<ChapterId, string> = {
+  home: "Hero",
+  apps: "Projects",
+  about: "The Studios",
+  projects: "Selected works",
+  contact: "Write Me",
+};
+
+function isChapter(id: string): id is ChapterId {
+  return (CHAPTERS as readonly string[]).includes(id);
+}
+
+let openChapter = (id: string) => {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.scrollIntoView({ behavior: "smooth", block: "start" });
+};
+
+export function revealChapter(id: string) {
+  openChapter(id);
+}
+
 function onSectionClick(event: React.MouseEvent<HTMLAnchorElement>, id: string) {
   event.preventDefault();
   history.replaceState(null, "", `/#${id}`);
-  scrollToSection(id);
+  revealChapter(id);
+}
+
+function atPageEnd() {
+  return window.innerHeight + getScrollY() >= document.documentElement.scrollHeight - 28;
+}
+
+function findProject(projects: Project[], title: string) {
+  return projects.find((project) => project.title === title);
+}
+
+function storeHref(project: Project) {
+  return project.appStore || project.playStore || "";
+}
+
+function startYear(exp: Experience) {
+  const match = exp.roles.map((role) => role.period).join(" ").match(/\d{4}/);
+  return match ? Number(match[0]) : 9999;
+}
+
+function countOf(badge: string) {
+  const match = badge.match(/\d+/);
+  return match ? match[0] : badge;
 }
 
 export default function OnePage() {
   const { content, loading } = usePortfolioContent();
   const [holdSkeleton, setHoldSkeleton] = useState(true);
-  const { hero, stats, about, experiences, contact, projects, footer } = content;
-  const years = stats.find((s) => /year/i.test(s.label));
+  const reduce = useReducedMotion();
+  const [shown, setShown] = useState(() => {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return CHAPTERS.length;
+    const hash = window.location.hash.replace("#", "");
+    const index = CHAPTERS.indexOf(hash as ChapterId);
+    return index >= 0 ? index + 1 : 1;
+  });
+  const [current, setCurrent] = useState(0);
+  const shownRef = useRef(shown);
+  const pending = useRef<string | null>(null);
+  const lock = useRef(false);
+  shownRef.current = shown;
+  const { hero, about, experiences, contact, projects, footer } = content;
   const year = new Date().getFullYear();
+  const portrait =
+    !hero.profileImg || hero.profileImg === "/profile.png" || hero.profileImg === "/portrait.png"
+      ? "/portrait.png?v=2"
+      : hero.profileImg;
+
+  const revealThrough = (count: number) => {
+    setShown((currentCount) => Math.max(currentCount, Math.min(CHAPTERS.length, count)));
+  };
+
+  const present = (id: string) => {
+    window.setTimeout(() => scrollToSection(id), 48);
+  };
+
+  useEffect(() => {
+    openChapter = (id: string) => {
+      if (!isChapter(id)) return;
+      const index = CHAPTERS.indexOf(id);
+      if (reduce || index < shownRef.current) {
+        scrollToSection(id);
+        return;
+      }
+      pending.current = id;
+      revealThrough(index + 1);
+      present(id);
+    };
+    return () => {
+      openChapter = (next) => {
+        document.getElementById(next)?.scrollIntoView({ behavior: "smooth", block: "start" });
+      };
+    };
+  });
+
+  useEffect(() => {
+    if (reduce) return;
+    const revealNext = () => {
+      if (lock.current || shownRef.current >= CHAPTERS.length) return;
+      const next = shownRef.current;
+      const id = CHAPTERS[next];
+      lock.current = true;
+      pending.current = id;
+      revealThrough(next + 1);
+      present(id);
+      window.setTimeout(() => {
+        lock.current = false;
+      }, 980);
+    };
+    let bucket = 0;
+    const onWheel = (event: WheelEvent) => {
+      if (document.querySelector(".fc-preview")) return;
+      if (event.deltaY <= 0) {
+        bucket = 0;
+        return;
+      }
+      if (lock.current) {
+        event.preventDefault();
+        return;
+      }
+      if (!atPageEnd() || shownRef.current >= CHAPTERS.length) {
+        bucket = 0;
+        return;
+      }
+      bucket += event.deltaY;
+      event.preventDefault();
+      if (bucket < 48) return;
+      bucket = 0;
+      revealNext();
+    };
+    let touchY = 0;
+    const onTouchStart = (event: TouchEvent) => {
+      touchY = event.touches[0]?.clientY ?? 0;
+    };
+    const onTouchEnd = (event: TouchEvent) => {
+      const end = event.changedTouches[0]?.clientY ?? touchY;
+      if (document.querySelector(".fc-preview")) return;
+      if (touchY - end < 56 || lock.current || !atPageEnd()) return;
+      revealNext();
+    };
+    const onKey = (event: KeyboardEvent) => {
+      const typing = event.target instanceof HTMLElement && event.target.closest("input, textarea, button, a");
+      if (typing) return;
+      if (event.key !== "ArrowDown" && event.key !== "PageDown" && event.key !== " ") return;
+      if (!atPageEnd() || shownRef.current >= CHAPTERS.length) return;
+      event.preventDefault();
+      revealNext();
+    };
+    window.addEventListener("wheel", onWheel, { passive: false });
+    window.addEventListener("touchstart", onTouchStart, { passive: true });
+    window.addEventListener("touchend", onTouchEnd, { passive: true });
+    window.addEventListener("keydown", onKey);
+    return () => {
+      window.removeEventListener("wheel", onWheel);
+      window.removeEventListener("touchstart", onTouchStart);
+      window.removeEventListener("touchend", onTouchEnd);
+      window.removeEventListener("keydown", onKey);
+    };
+  }, [reduce]);
+
+  useEffect(() => {
+    const onScroll = () => {
+      const pos = getScrollY() + 160;
+      let next = 0;
+      CHAPTERS.forEach((id, index) => {
+        const el = document.getElementById(id);
+        if (el && el.offsetHeight > 8 && el.offsetTop <= pos) next = index;
+      });
+      setCurrent(next);
+    };
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, [shown]);
 
   useEffect(() => {
     if (!loading) {
@@ -83,512 +270,266 @@ export default function OnePage() {
 
   if (loading && holdSkeleton) return <PageSkeleton />;
 
+  const selected = SELECTED.map((title) => findProject(projects, title)).filter((project): project is Project => Boolean(project));
+  const studios = [...experiences].sort((a, b) => {
+    const currentA = a.roles.some((role) => role.current) ? 0 : 1;
+    const currentB = b.roles.some((role) => role.current) ? 0 : 1;
+    if (currentA !== currentB) return currentA - currentB;
+    return startYear(a) - startYear(b);
+  });
+
   return (
     <div className="fc">
       <section className="fc-hero" id="home">
         <div className="fc-hero-copy">
-          <BinarySlide />
-          <h1>Nineteen Apps, Both Stores</h1>
-          <p className="fc-lede">{plain(hero.bio)}</p>
-          <p className="fc-quiet">
-            {years ? `${years.value}${years.suffix || ""} years` : "Since 2019"} in Indonesia, on iOS and Android.
-          </p>
-          <div className="fc-actions">
-            <a className="fc-btn fc-btn-primary fc-btn-large" href="#apps" onClick={(event) => onSectionClick(event, "apps")}>
-              See the Apps
-            </a>
-            <a className="fc-btn fc-btn-secondary fc-btn-large" href="#contact" onClick={(event) => onSectionClick(event, "contact")}>
-              Write Him
-            </a>
-          </div>
+          <p className="fc-hello">Hello, I am</p>
+          <h1>
+            Mobile
+            <br />
+            Engineer.
+          </h1>
+          <p className="fc-lede">{heroBio(hero.bio, hero.name)}</p>
+          <a className="fc-btn" href="#apps" onClick={(event) => onSectionClick(event, "apps")}>
+            See the apps
+          </a>
+          {shown === 1 ? (
+            <button className="fc-cue" type="button" onClick={() => revealChapter("apps")}>
+              Scroll
+              <i />
+            </button>
+          ) : null}
         </div>
-        <img
-          className="fc-portrait"
-          src={hero.profileImg || "/profile.png"}
-          alt={`Portrait of ${hero.name}`}
-          width={1200}
-          height={1500}
-          fetchPriority="high"
-          onError={(event) => {
-            event.currentTarget.src = "/profile.svg";
-          }}
-        />
-      </section>
-
-      <AppSlider projects={projects} loading={loading} title={label(content.projectsTitle || "Shipped Apps")} />
-
-      <section className="fc-block" id="about" aria-labelledby="studios-title">
-        <header className="fc-block-head">
-          <h2 id="studios-title">{label(about.title || "The Studios")}</h2>
-          <p>{plain(about.intro)}</p>
-        </header>
-        <div className="fc-studios">
-          {experiences.map((exp) => (
-            <Studio key={exp.company} exp={exp} />
-          ))}
+        <div className="fc-panel">
+          <HeroMarks />
+          <img
+            className="fc-portrait"
+            src={portrait}
+            alt={`Portrait of ${hero.name}`}
+            width={585}
+            height={1024}
+            fetchPriority="high"
+            onError={(event) => {
+              event.currentTarget.src = "/profile.svg";
+            }}
+          />
         </div>
       </section>
 
-      <section className="fc-block" id="contact" aria-labelledby="write-title">
-        <div className="fc-write">
-          <div>
-            <h2 id="write-title">{label(contact.title || "Write Him")}</h2>
-            <p>{plain(contact.intro)}</p>
-            <a className="fc-mail" href={`mailto:${contact.email}`}>{contact.email}</a>
-            <div className="fc-text-links">
-              <a href={contact.linkedinUrl} target="_blank" rel="noreferrer">LinkedIn</a>
-              <a href={contact.githubUrl} target="_blank" rel="noreferrer">GitHub</a>
-            </div>
-          </div>
-          <ContactForm email={contact.email} />
+      <Chapter id="apps" open={shown > 1} label="Projects">
+        <div className="fc-band">
+          <TestimonialsSection projects={projects} />
         </div>
-      </section>
+      </Chapter>
 
-      <footer className="fc-foot">
-        <p>{hero.name}</p>
-        <nav aria-label="Page">
-          <a href="#home" onClick={(event) => onSectionClick(event, "home")}>Home</a>
-          <a href="#apps" onClick={(event) => onSectionClick(event, "apps")}>Apps</a>
-          <a href="#projects" onClick={(event) => onSectionClick(event, "projects")}>Every Title</a>
-          <a href="#about" onClick={(event) => onSectionClick(event, "about")}>Career</a>
-          <a href="#contact" onClick={(event) => onSectionClick(event, "contact")}>Write Him</a>
-        </nav>
-        <p className="fc-quiet">{plain(footer).replace("{year}", String(year))}</p>
-      </footer>
-    </div>
-  );
-}
+      <Chapter id="about" open={shown > 2} label="The Studios">
+        <div className="fc-band fc-studios">
+          <header className="fc-block-head">
+            <h2 id="studios-title">{label(about.title || "The Studios")}</h2>
+            <p>{plain(about.intro)}</p>
+          </header>
+          <ol className="fc-line">
+            {studios.map((exp) => (
+              <Studio key={exp.company} exp={exp} />
+            ))}
+          </ol>
+        </div>
+      </Chapter>
 
-function RippleSlide({
-  slot,
-  project,
-  focused,
-  inMiddle,
-  phase,
-  reduce,
-  register,
-  onPick,
-}: {
-  slot: number;
-  project: Project;
-  focused: boolean;
-  inMiddle: boolean;
-  phase: MotionValue<number>;
-  reduce: boolean;
-  register: (node: HTMLButtonElement | null) => void;
-  onPick: (slot: number) => void;
-}) {
-  const calm = useRef(reduce);
-  calm.current = reduce;
-  const y = useTransform(phase, (shift) => {
-    if (calm.current) return 0;
-    return Math.sin(slot * 0.55 + shift) * 28;
-  });
-
-  return (
-    <motion.button
-      type="button"
-      className={focused ? "fc-slide is-focus" : "fc-slide"}
-      aria-current={inMiddle && focused ? "true" : undefined}
-      aria-hidden={inMiddle ? undefined : true}
-      tabIndex={inMiddle ? undefined : -1}
-      style={{ y }}
-      ref={register}
-      onClick={() => onPick(slot)}
-    >
-      <span className="fc-frame">
-        <Shot src={project.img} alt="" />
-      </span>
-      <span className="fc-slide-name">{project.title}</span>
-    </motion.button>
-  );
-}
-
-function AppSlider({ projects, loading, title }: { projects: Project[]; loading: boolean; title: string }) {
-  const count = projects.length;
-  const copies = count > 1 ? 3 : 1;
-  const reduce = Boolean(useReducedMotion());
-  const [pos, setPos] = useState(count);
-  const [dragging, setDragging] = useState(false);
-  const railRef = useRef<HTMLDivElement>(null);
-  const slides = useRef<(HTMLButtonElement | null)[]>([]);
-  const pointer = useRef<{ id: number; x: number; y: number; origin: number; dx: number; lock: "x" | "y" | null } | null>(null);
-  const trail = useRef<{ t: number; x: number }[]>([]);
-  const dragged = useRef(false);
-  const draggingRef = useRef(false);
-  const dragX = useRef(0);
-  const holding = useRef(false);
-  const flight = useRef<{ stop: () => void; finished: Promise<unknown> } | null>(null);
-  const posRef = useRef(pos);
-  const countRef = useRef(count);
-  const x = useMotionValue(0);
-  const phase = useMotionValue(0);
-  const logical = count === 0 ? 0 : ((pos % count) + count) % count;
-  const current = projects[logical];
-  const slidesToShow = Array.from({ length: copies }, () => projects).flat();
-  posRef.current = pos;
-  countRef.current = count;
-
-  const measure = (index: number) => {
-    const rail = railRef.current;
-    const slide = slides.current[index];
-    if (!rail || !slide) return null;
-    return -(slide.offsetLeft - (rail.clientWidth - slide.offsetWidth) / 2);
-  };
-
-  const span = () => {
-    const total = countRef.current;
-    if (total < 2) return 0;
-    const first = measure(total);
-    const third = measure(total * 2);
-    if (first == null || third == null) return 0;
-    return first - third;
-  };
-
-  const nearest = () => {
-    const rail = railRef.current;
-    if (!rail) return posRef.current;
-    const mid = rail.getBoundingClientRect().left + rail.clientWidth / 2;
-    let best = posRef.current;
-    let bestDist = Infinity;
-    slides.current.forEach((slide, index) => {
-      if (!slide) return;
-      const rect = slide.getBoundingClientRect();
-      const dist = Math.abs(rect.left + rect.width / 2 - mid);
-      if (dist < bestDist) {
-        bestDist = dist;
-        best = index;
-      }
-    });
-    return best;
-  };
-
-  const wrapX = () => {
-    const distance = span();
-    const origin = measure(countRef.current);
-    if (!(distance > 0) || origin == null) return;
-    let value = x.get();
-    const low = origin - distance;
-    while (value <= low) value += distance;
-    while (value > origin) value -= distance;
-    if (value !== x.get()) x.set(value);
-  };
-
-  const settle = (index: number, duration = 0.45) => {
-    const total = countRef.current;
-    const last = Math.max(0, slides.current.length - 1);
-    let next = index;
-    if (total > 1 && (next < 0 || next > last)) {
-      const distance = span();
-      while (next < 0) {
-        next += total;
-        if (distance > 0) x.set(x.get() - distance);
-      }
-      while (next > last) {
-        next -= total;
-        if (distance > 0) x.set(x.get() + distance);
-      }
-    }
-    next = Math.max(0, Math.min(last, next));
-    const target = measure(next);
-    if (target == null) return;
-    flight.current?.stop();
-    posRef.current = next;
-    setPos(next);
-    if (reduce) {
-      x.set(target);
-      return;
-    }
-    holding.current = true;
-    const anim = animate(x, target, { duration, ease: [0.22, 1, 0.36, 1] });
-    flight.current = anim;
-    void anim.finished.then(() => {
-      if (flight.current === anim) holding.current = false;
-    }).catch(() => {
-      if (flight.current === anim) holding.current = false;
-    });
-  };
-
-  const releaseToIndex = (velocity: number) => {
-    draggingRef.current = false;
-    setDragging(false);
-    const total = countRef.current;
-    if (total < 2) return;
-    wrapX();
-    const origin = measure(total);
-    const next = measure(total + 1);
-    if (origin == null || next == null || next === origin) {
-      settle(nearest());
-      return;
-    }
-    const width = next - origin;
-    const travel = velocity * 520;
-    let steps = Math.round(travel / width);
-    const limit = total - 1;
-    steps = Math.max(-limit, Math.min(limit, steps));
-    const closest = nearest();
-    const distance = Math.abs(steps * width);
-    settle(closest + steps, Math.min(1.05, Math.max(0.34, distance / 1400)));
-  };
-
-  const go = (delta: number) => {
-    if (count < 2) return;
-    settle(posRef.current + delta);
-  };
-
-  useEffect(() => {
-    setPos(count);
-  }, [count]);
-
-  useEffect(() => {
-    if (reduce || count < 2) return;
-    let frame = 0;
-    let last = performance.now();
-    const tick = (now: number) => {
-      const dt = Math.min(32, now - last);
-      last = now;
-      if (!draggingRef.current) phase.set(phase.get() + dt * 0.0016);
-      if (!draggingRef.current && !holding.current) {
-        const distance = span();
-        const origin = measure(countRef.current);
-        let value = x.get() - (96 * dt) / 1000;
-        if (distance > 0 && origin != null) {
-          const low = origin - distance;
-          while (value <= low) value += distance;
-          while (value > origin) value -= distance;
-        }
-        x.set(value);
-        const closest = nearest();
-        if (closest !== posRef.current) {
-          posRef.current = closest;
-          setPos(closest);
-        }
-      }
-      frame = requestAnimationFrame(tick);
-    };
-    frame = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(frame);
-  }, [reduce, count, phase, x]);
-
-  useEffect(() => {
-    const onResize = () => {
-      const target = measure(posRef.current);
-      if (target != null) x.set(target);
-    };
-    window.addEventListener("resize", onResize);
-    return () => window.removeEventListener("resize", onResize);
-  }, [x]);
-
-  useLayoutEffect(() => {
-    const target = measure(count > 1 ? count : 0);
-    if (target != null) x.set(target);
-  }, [count, x]);
-
-  return (
-    <section
-      className="fc-block"
-      id="apps"
-      aria-labelledby="apps-title"
-      onKeyDown={(event) => {
-        if (event.key === "ArrowRight") {
-          event.preventDefault();
-          go(1);
-        }
-        if (event.key === "ArrowLeft") {
-          event.preventDefault();
-          go(-1);
-        }
-      }}
-    >
-      <header className="fc-block-head">
-        <h2 id="apps-title">{title}</h2>
-        <p id="projects">
-          {loading && projects.length === 0
-            ? "Loading the list…"
-            : `${projects.length} titles in one row.`}
-        </p>
-      </header>
-      {projects.length === 0 ? <p className="fc-quiet">No apps in this record yet.</p> : null}
-      <div
-        className={dragging ? "fc-rail is-dragging" : "fc-rail"}
-        ref={railRef}
-        role="region"
-        aria-roledescription="carousel"
-        aria-label="Shipped apps"
-        onPointerDown={(event) => {
-          if (event.pointerType === "mouse" && event.button !== 0) return;
-          pointer.current = { id: event.pointerId, x: event.clientX, y: event.clientY, origin: x.get(), dx: 0, lock: null };
-          trail.current = [{ t: performance.now(), x: event.clientX }];
-          dragged.current = false;
-          flight.current?.stop();
-          try { event.currentTarget.setPointerCapture(event.pointerId); } catch { /* synthetic pointers have no capture */ }
-        }}
-        onPointerMove={(event) => {
-          const start = pointer.current;
-          if (!start || start.id !== event.pointerId) return;
-          const dx = event.clientX - start.x;
-          const dy = event.clientY - start.y;
-          if (start.lock === null) {
-            if (Math.hypot(dx, dy) < 6) return;
-            start.lock = Math.abs(dx) > Math.abs(dy) ? "x" : "y";
-            if (start.lock === "y") {
-              pointer.current = null;
-              return;
-            }
-            draggingRef.current = true;
-            dragX.current = x.get();
-            setDragging(true);
-          }
-          start.dx = dx;
-          dragged.current = Math.abs(dx) > 8;
-          const now = performance.now();
-          trail.current.push({ t: now, x: event.clientX });
-          const recent = now - 120;
-          while (trail.current.length > 2 && trail.current[0].t < recent) trail.current.shift();
-          const raw = start.origin + dx;
-          phase.set(phase.get() + (dragX.current - raw) * (0.0016 / 0.096));
-          dragX.current = raw;
-          x.set(raw);
-          wrapX();
-        }}
-        onPointerUp={(event) => {
-          const start = pointer.current;
-          if (!start || start.id !== event.pointerId) return;
-          pointer.current = null;
-          if (start.lock !== "x") return;
-          const now = performance.now();
-          const recent = trail.current.filter((point) => now - point.t <= 120);
-          const pair = recent.length >= 2 ? [recent[0], recent[recent.length - 1]] : null;
-          const dt = pair ? pair[1].t - pair[0].t : 0;
-          const velocity = pair && dt > 0 ? (pair[1].x - pair[0].x) / dt : 0;
-          releaseToIndex(velocity);
-        }}
-        onPointerCancel={() => {
-          pointer.current = null;
-          if (!draggingRef.current) return;
-          releaseToIndex(0);
-        }}
-      >
-        <motion.div className="fc-track" style={{ x }}>
-          {slidesToShow.map((project, slot) => {
-            const realIndex = count === 0 ? 0 : slot % count;
-            const focused = realIndex === logical;
-            const inMiddle = count < 2 || (slot >= count && slot < count * 2);
-            return (
-              <RippleSlide
-                key={`${project.title}-${slot}`}
-                slot={slot}
+      <Chapter id="projects" open={shown > 3} label="Selected works">
+        <div className="fc-band fc-selected">
+          <p className="fc-eyebrow">The apps</p>
+          <h2 id="selected-title">Selected works</h2>
+          <div className="fc-picks">
+            {selected.map((project) => (
+              <ProjectCard
+                key={project.title}
                 project={project}
-                focused={focused}
-                inMiddle={inMiddle}
-                phase={phase}
-                reduce={reduce}
-                register={(node) => { slides.current[slot] = node; }}
-                onPick={(picked) => {
-                  if (dragged.current) {
-                    dragged.current = false;
-                    return;
-                  }
-                  if (count < 2 || picked === pos) return;
-                  setPos(picked);
-                }}
+                name={project.title === "KohBus Rider" ? "KohBus" : project.title}
+                blurb={BLURB[project.title] || plain(project.desc)}
+                pick
               />
-            );
-          })}
-        </motion.div>
-      </div>
-      {current ? (
-        <div className="fc-focus-copy" aria-live="off">
-          <h3>{current.title}</h3>
-          <p>{plain(current.desc)}</p>
-          <StoreLinks project={current} />
-        </div>
-      ) : null}
-    </section>
-  );
-}
-
-function Bone({ className }: { className?: string }) {
-  return <span className={className ? `fc-bone ${className}` : "fc-bone"} />;
-}
-
-function PageSkeleton() {
-  return (
-    <div className="fc fc-skeleton" aria-busy="true">
-      <p className="fc-sr">Loading the page</p>
-      <section className="fc-hero" aria-hidden="true">
-        <div className="fc-hero-copy">
-          <Bone className="fc-bone-binary" />
-          <Bone className="fc-bone-title" />
-          <Bone className="fc-bone-title is-short" />
-          <Bone className="fc-bone-line" />
-          <Bone className="fc-bone-line is-short" />
-          <Bone className="fc-bone-quiet" />
-          <div className="fc-actions">
-            <Bone className="fc-bone-btn" />
-            <Bone className="fc-bone-btn" />
+            ))}
           </div>
         </div>
-        <Bone className="fc-bone-portrait" />
-      </section>
-      <section className="fc-block" aria-hidden="true">
-        <header className="fc-block-head">
-          <Bone className="fc-bone-h2" />
-          <Bone className="fc-bone-quiet" />
-        </header>
-        <div className="fc-bone-rail">
-          {Array.from({ length: 5 }, (_, index) => (
-            <Bone className="fc-bone-phone" key={index} />
-          ))}
+      </Chapter>
+
+      <Chapter id="contact" open={shown > 4} label="Write Me">
+        <div className="fc-band">
+          <div className="fc-write">
+            <div>
+              <h2 id="write-title">{voice(contact.title || "Write me")}</h2>
+              <p>{plain(contact.intro)}</p>
+              <a className="fc-mail" href={`mailto:${contact.email}`}>{contact.email}</a>
+              <div className="fc-text-links">
+                <a href={contact.linkedinUrl} target="_blank" rel="noreferrer">LinkedIn</a>
+                <a href={contact.githubUrl} target="_blank" rel="noreferrer">GitHub</a>
+              </div>
+            </div>
+            <ContactForm email={contact.email} />
+          </div>
         </div>
+        <footer className="fc-foot">
+          <p>{hero.name}</p>
+          <nav aria-label="Page">
+            <a href="#home" onClick={(event) => onSectionClick(event, "home")}>Home</a>
+            <a href="#apps" onClick={(event) => onSectionClick(event, "apps")}>Projects</a>
+            <a href="#projects" onClick={(event) => onSectionClick(event, "projects")}>Every Title</a>
+            <a href="#about" onClick={(event) => onSectionClick(event, "about")}>Career</a>
+            <a href="#contact" onClick={(event) => onSectionClick(event, "contact")}>Write Me</a>
+          </nav>
+          <p className="fc-quiet">{plain(footer).replace("{year}", String(year))}</p>
+        </footer>
+      </Chapter>
+
+      <nav className="fc-steps" aria-label="Sections">
+        {CHAPTERS.map((id, index) => (
+          <button
+            key={id}
+            type="button"
+            aria-label={STEP_LABEL[id]}
+            aria-current={index === current ? "true" : undefined}
+            className={index < shown ? "is-on" : ""}
+            onClick={() => {
+              history.replaceState(null, "", `/#${id}`);
+              revealChapter(id);
+            }}
+          />
+        ))}
+      </nav>
+    </div>
+  );
+}
+
+function Chapter({
+  id,
+  open,
+  label,
+  children,
+}: {
+  id: string;
+  open: boolean;
+  label: string;
+  children: React.ReactNode;
+}) {
+  const reduce = useReducedMotion();
+  if (reduce) {
+    return (
+      <section id={id} aria-label={label}>
+        {children}
       </section>
-    </div>
-  );
-}
-
-function BinarySlide() {
-  return (
-    <div className="fc-binary" aria-hidden="true">
-      <div className="fc-binary-track">
-        <span>{BINARY_LINE}</span>
-        <span>{BINARY_LINE}</span>
-      </div>
-    </div>
-  );
-}
-
-function StoreLinks({ project }: { project: Project }) {
-  if (!project.appStore && !project.playStore) {
-    return <p className="fc-quiet">No public store link</p>;
+    );
   }
   return (
-    <p className="fc-stores">
-      {project.appStore ? <a href={project.appStore} target="_blank" rel="noreferrer">App Store</a> : null}
-      {project.playStore ? <a href={project.playStore} target="_blank" rel="noreferrer">Google Play</a> : null}
-    </p>
+    <motion.section
+      id={id}
+      aria-label={label}
+      className={open ? "fc-chapter is-shown" : "fc-chapter"}
+      initial={false}
+      animate={open ? "show" : "hide"}
+      variants={{
+        hide: { height: 0, visibility: "hidden", transition: { duration: 0.45, ease: [0.4, 0, 1, 1] } },
+        show: {
+          height: "auto",
+          visibility: "visible",
+          transition: { duration: 0.9, ease: [0.16, 1, 0.3, 1], visibility: { duration: 0 } },
+        },
+      }}
+    >
+      <motion.div
+        className="fc-chapter-in"
+        initial={false}
+        animate={open ? "show" : "hide"}
+        variants={{
+          hide: { opacity: 0, y: 72, filter: "blur(14px)" },
+          show: {
+            opacity: 1,
+            y: 0,
+            filter: "blur(0px)",
+            transition: { duration: 0.95, delay: 0.06, ease: [0.16, 1, 0.3, 1] },
+          },
+        }}
+      >
+        {children}
+      </motion.div>
+    </motion.section>
+  );
+}
+
+function HeroMarks() {
+  return (
+    <svg className="fc-marks" viewBox="0 0 680 720" fill="none" aria-hidden="true">
+      <g stroke="currentColor" strokeWidth="1.4">
+        <circle cx="168" cy="118" r="28" />
+        <path d="M250 210 L286 272 H214 Z" />
+        <path d="M520 70 L548 86 L548 118 L520 134 L492 118 L492 86 Z" />
+        <path d="M600 168 L624 182 L624 210 L600 224 L576 210 L576 182 Z" />
+        <circle cx="560" cy="520" r="54" />
+      </g>
+      <g fill="currentColor">
+        {[0, 1, 2].map((row) =>
+          [0, 1, 2].map((col) => <circle key={`${row}-${col}`} cx={78 + col * 16} cy={64 + row * 16} r="2.2" />),
+        )}
+        {[0, 1, 2].map((row) =>
+          [0, 1].map((col) => <circle key={`d-${row}-${col}`} cx={612 + col * 14} cy={48 + row * 14} r="2" />),
+        )}
+      </g>
+    </svg>
+  );
+}
+
+function ProjectCard({
+  project,
+  name,
+  wide,
+  blurb,
+  pick,
+}: {
+  project: Project;
+  name: string;
+  wide?: boolean;
+  blurb?: string;
+  pick?: boolean;
+}) {
+  const href = storeHref(project);
+  const body = (
+    <>
+      <span className="fc-shot">
+        <Shot src={project.img} alt="" />
+      </span>
+      <span className="fc-card-copy">
+        <span className="fc-card-name">{name}</span>
+        {blurb ? <span className="fc-card-blurb">{blurb}</span> : null}
+      </span>
+    </>
+  );
+  const className = `fc-card${wide ? " is-wide" : ""}${pick ? " is-pick" : ""}`;
+  if (!href) {
+    return <article className={className}>{body}</article>;
+  }
+  return (
+    <a className={className} href={href} target="_blank" rel="noreferrer">
+      {body}
+    </a>
   );
 }
 
 function Studio({ exp }: { exp: Experience }) {
   const current = exp.roles.some((role) => role.current);
+  const year = startYear(exp);
+  const when = current
+    ? `${year} – Present`
+    : exp.roles.map((role) => `${role.type}, ${role.period}`).join(" · ");
   return (
-    <article className={current ? "fc-studio is-current" : "fc-studio"}>
-      <div>
+    <li className={current ? "is-current" : ""}>
+      <span className="fc-year">{year}</span>
+      <span className="fc-dot" aria-hidden="true" />
+      <span className="fc-num">{countOf(exp.badge)}</span>
+      <div className={current ? "fc-now" : "fc-then"}>
         <h3>{exp.company}</h3>
-        <p className="fc-count">{exp.badge}{current ? " · Current" : ""}</p>
-      </div>
-      <div>
+        <p className="fc-when">{when}</p>
         <p>{plain(exp.desc)}</p>
-        <ul>
-          {exp.roles.map((role) => (
-            <li key={`${role.type}-${role.period}`}>
-              {role.type}, {role.period}{role.current ? ", current" : ""}
-            </li>
-          ))}
-        </ul>
-        <p className="fc-quiet">{exp.tags.join(", ")}</p>
       </div>
-    </article>
+    </li>
   );
 }
 
@@ -596,16 +537,7 @@ function Shot({ src, alt }: { src: string; alt: string }) {
   const [failed, setFailed] = useState(false);
   useEffect(() => { setFailed(false); }, [src]);
   if (failed || !src) return <span className="fc-frame-empty">No shot</span>;
-  return (
-    <img
-      src={src}
-      alt={alt}
-      width={720}
-      height={900}
-      loading="lazy"
-      onError={() => setFailed(true)}
-    />
-  );
+  return <img src={src} alt={alt} width={720} height={900} loading="lazy" onError={() => setFailed(true)} />;
 }
 
 function ContactForm({ email }: { email: string }) {
@@ -629,19 +561,41 @@ function ContactForm({ email }: { email: string }) {
   return (
     <form className="fc-form" onSubmit={onSubmit}>
       <label>
-        Name
-        <input name="name" type="text" autoComplete="name" required />
+        <span className="fc-sr">Name</span>
+        <input name="name" type="text" autoComplete="name" placeholder="Name" required />
       </label>
       <label>
-        Subject
-        <input name="subject" type="text" />
+        <span className="fc-sr">Subject</span>
+        <input name="subject" type="text" placeholder="Subject" />
       </label>
-      <label className="fc-field-wide">
-        Message
-        <textarea name="message" required />
+      <label>
+        <span className="fc-sr">Message</span>
+        <textarea name="message" placeholder="Message" required />
       </label>
-      <button className="fc-btn fc-btn-primary" type="submit">Send the Note</button>
+      <button className="fc-btn" type="submit">Send the Note</button>
       {note ? <p className="fc-status" role="status">{note}</p> : null}
     </form>
+  );
+}
+
+function Bone({ className }: { className?: string }) {
+  return <span className={className ? `fc-bone ${className}` : "fc-bone"} />;
+}
+
+function PageSkeleton() {
+  return (
+    <div className="fc fc-skeleton" aria-busy="true">
+      <p className="fc-sr">Loading the page</p>
+      <section className="fc-hero" aria-hidden="true">
+        <div className="fc-hero-copy">
+          <Bone className="fc-bone-quiet" />
+          <Bone className="fc-bone-title" />
+          <Bone className="fc-bone-title is-short" />
+          <Bone className="fc-bone-line" />
+          <Bone className="fc-bone-btn" />
+        </div>
+        <Bone className="fc-bone-portrait" />
+      </section>
+    </div>
   );
 }
