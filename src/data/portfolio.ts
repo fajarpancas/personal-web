@@ -145,7 +145,7 @@ export const DEFAULT_CONTENT: PortfolioContent = {
   projects: [
     {
       title: "JIFF Customer",
-      desc: "A consumer super app that combines a marketplace with on-demand express delivery.",
+      desc: "Marketplace and on-demand express delivery in one consumer app, from browsing and checkout to live order tracking.",
       img: "/jiff-customer.png",
       tags: ["React Native", "TypeScript", "Marketplace", "Real-time"],
       appStore: "https://apps.apple.com/us/app/jiff-express-shopping/id6749932038",
@@ -153,7 +153,7 @@ export const DEFAULT_CONTENT: PortfolioContent = {
     },
     {
       title: "JIFF Agent",
-      desc: "A field-operations super app supporting four roles: Merchant, Storage, Rider, and Reseller agents.",
+      desc: "Field operations for four roles — Merchant, Storage, Rider, and Reseller — each with its own permissions and workflow.",
       img: "/jiff-agent.png",
       tags: ["React Native", "TypeScript", "Roles & Permissions"],
       appStore: "https://apps.apple.com/us/app/jiff-agent-partners-app/id6749932298",
@@ -161,7 +161,7 @@ export const DEFAULT_CONTENT: PortfolioContent = {
     },
     {
       title: "KohBus Driver",
-      desc: "A driver app with turn-by-turn navigation across scheduled routes and waypoints, plus in-app messaging with riders on the same route.",
+      desc: "Turn-by-turn navigation across scheduled routes and waypoints, plus in-app messaging with riders on the same trip.",
       img: "/kohbus-driver.png",
       tags: ["React Native", "Maps", "Navigation", "Real-time"],
       appStore: "https://apps.apple.com/id/app/kohbus-driver/id6738333966?l=id",
@@ -169,7 +169,7 @@ export const DEFAULT_CONTENT: PortfolioContent = {
     },
     {
       title: "KohBus Rider",
-      desc: "A rider app for bus booking, live vehicle tracking, and in-app chat with drivers.",
+      desc: "Bus booking with live vehicle tracking and direct in-app chat with the driver.",
       img: "/kohbus-rider.png",
       tags: ["React Native", "Maps", "Booking", "Chat"],
       appStore: "https://apps.apple.com/id/app/kohbus-rider/id6738334250?l=id",
@@ -177,7 +177,7 @@ export const DEFAULT_CONTENT: PortfolioContent = {
     },
     {
       title: "Madkhal",
-      desc: "An Islamic app with Qibla direction, prayer times (currently Malaysia & Singapore), and free/premium learning content via videos and documents.",
+      desc: "Qibla direction and prayer times for Malaysia and Singapore, with free and premium lessons delivered as video and documents.",
       img: "/madkhal.png",
       tags: ["React Native", "Offline", "Multimedia"],
       appStore: "https://apps.apple.com/id/app/madkhal/id6479597417?l=id",
@@ -185,7 +185,7 @@ export const DEFAULT_CONTENT: PortfolioContent = {
     },
     {
       title: "VirtualSpace",
-      desc: "Mobile based chat and project management application",
+      desc: "Chat and project management for teams, with real-time messaging over WebSocket.",
       img: "/virtualspace.png",
       tags: ["React Native", "Chat", "WebSocket", "Redux"],
       appStore: "https://apps.apple.com/id/app/virtualspace-work-smarter/id1513794884",
@@ -193,7 +193,7 @@ export const DEFAULT_CONTENT: PortfolioContent = {
     },
     {
       title: "KoolBuddy",
-      desc: "A digital companion app for carbon-conscious generation",
+      desc: "Companion app that turns carbon-conscious habits into tracked, gamified daily actions.",
       img: "/koolbuddy.png",
       tags: ["React Native", "Gamification", "Tracking"],
       appStore: "https://apps.apple.com/mn/app/kool-buddy/id6450994509",
@@ -201,7 +201,7 @@ export const DEFAULT_CONTENT: PortfolioContent = {
     },
     {
       title: "Achiever Dream+",
-      desc: "Mobile based for chemistry practical examination in Singapore with an NEA-approved Chemistry Practical Lab",
+      desc: "Chemistry practical exam preparation for Singapore students, built with an NEA-approved practical lab.",
       img: "/achiever-dream-plus.png",
       tags: ["React Native", "Exam Platform", "Content"],
       appStore: "https://apps.apple.com/id/app/achievers-dream/id1662868706?l=id",
@@ -209,7 +209,7 @@ export const DEFAULT_CONTENT: PortfolioContent = {
     },
     {
       title: "Moirai MomCare",
-      desc: "Mobile based to assist every step of pregnancy journey",
+      desc: "Pregnancy companion covering each stage of the journey, with tracking and timely reminders.",
       img: "/momcare.png",
       tags: ["React Native", "Health", "Reminders"],
       appStore: "https://apps.apple.com/sg/app/moirai-momcare/id1663835824",
@@ -217,7 +217,7 @@ export const DEFAULT_CONTENT: PortfolioContent = {
     },
     {
       title: "Together Living",
-      desc: "Mobile base payment for room rental with features chat, store, reward.",
+      desc: "Room-rental payments for residents, with in-app chat, a store, and rewards in the same app.",
       img: "/together-living.png",
       tags: ["React Native", "Payments", "Chat", "Rewards"],
       appStore: "https://apps.apple.com/us/app/together-living/id1583899658",
@@ -225,7 +225,7 @@ export const DEFAULT_CONTENT: PortfolioContent = {
     },
     {
       title: "Tzu-Chi Volunteer Management",
-      desc: "Mobile based application volunteer management for Tzu-Chi Malaysia",
+      desc: "Volunteer management for Tzu Chi Malaysia, built to keep working offline in the field.",
       img: "/tzu-chi-vms.png",
       tags: ["React Native", "Volunteer Management", "Offline"],
       appStore: "",
@@ -233,7 +233,7 @@ export const DEFAULT_CONTENT: PortfolioContent = {
     },
     {
       title: "WhatsDoc",
-      desc: "Mobile based doctor-to-doctor and doctor-to-patient consultation via chat or video call",
+      desc: "Doctor-to-doctor and doctor-to-patient consultations over chat and video call.",
       img: "/whatsdoc.png",
       tags: ["React Native", "Video Call", "Telehealth"],
       appStore: "",
@@ -241,7 +241,7 @@ export const DEFAULT_CONTENT: PortfolioContent = {
     },
     {
       title: "Duedi: The investor's toolkit",
-      desc: "Mobile based toolkits for investor, this app provide 12 free tools for investor",
+      desc: "Investor toolkit that puts twelve free investing tools in one app.",
       img: "/duedi.png",
       tags: ["React Native", "Finance", "Charts"],
       appStore: "",
@@ -249,7 +249,7 @@ export const DEFAULT_CONTENT: PortfolioContent = {
     },
     {
       title: "AntriQue Merchant Operator",
-      desc: "Mobile based queue used by the admin of the merchant to create new queue",
+      desc: "Merchant-side queue control, where operators create and manage queues for walk-in customers.",
       img: "/antrique-operator.png",
       tags: ["React Native", "Queue", "Admin"],
       appStore: "",
@@ -257,7 +257,7 @@ export const DEFAULT_CONTENT: PortfolioContent = {
     },
     {
       title: "AntriQue KIOSK",
-      desc: "Mobile based queue thats connects to a Bluetooth thermal printer device for retrieval and printing the queue tickets",
+      desc: "Self-service queue kiosk that prints numbered tickets through a Bluetooth thermal printer.",
       img: "/antrique-kiosk.png",
       tags: ["React Native", "Bluetooth", "Thermal Printing"],
       appStore: "",
@@ -265,7 +265,7 @@ export const DEFAULT_CONTENT: PortfolioContent = {
     },
     {
       title: "AntriQue Customer",
-      desc: "Mobile based queue used by user for queue retrieval and monitoring",
+      desc: "Customer queue app to take a number remotely and follow the queue in real time.",
       img: "/antrique-customer.png",
       tags: ["React Native", "Queue", "Real-time"],
       appStore: "",
@@ -273,7 +273,7 @@ export const DEFAULT_CONTENT: PortfolioContent = {
     },
     {
       title: "Medimate Malaysia",
-      desc: "Medimate Malaysia helps individuals and families arrange trusted, non-medical companion support for hospital and clinic appointments.",
+      desc: "Helps individuals and families in Malaysia arrange trusted, non-medical companion support for hospital and clinic appointments.",
       img: "/medimate-malaysia.png",
       tags: ["React Native", "Companion", "Malaysia"],
       clientCountry: "Malaysia",
@@ -282,7 +282,7 @@ export const DEFAULT_CONTENT: PortfolioContent = {
     },
     {
       title: "Medimate Companion Malaysia",
-      desc: "Companions accompany users during medical appointments, help with hospital and clinic navigation, registration and paperwork, wait through the visit, give non-medical practical and emotional support, and send progress updates to authorised family members.",
+      desc: "Guides patients through medical appointments — navigation, registration, and paperwork — and sends progress updates to authorised family members.",
       img: "/medimate-companion.png",
       tags: ["React Native", "Companion", "Appointments"],
       clientCountry: "Malaysia",

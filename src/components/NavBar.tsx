@@ -7,8 +7,8 @@ const LINKS = [
   { id: "home", label: "Home" },
   { id: "apps", label: "Projects" },
   { id: "about", label: "Career" },
-  { id: "contact", label: "Write" },
-  { id: "contact", label: "Contact", key: "contact-2" },
+  { id: "ai", label: "AI Content" },
+  { id: "contact", label: "Contact" },
 ];
 
 export default function NavBar() {
@@ -16,13 +16,16 @@ export default function NavBar() {
   const [active, setActive] = useState("home");
 
   useEffect(() => {
-    const ids = ["home", "apps", "about", "projects", "contact"];
+    const ids = ["home", "apps", "about", "projects", "ai", "contact"];
     const onScroll = () => {
       const pos = getScrollY() + 120;
       let current = "home";
       for (const id of ids) {
         const el = document.getElementById(id);
         if (el && el.offsetHeight > 8 && el.offsetTop <= pos) current = id;
+      }
+      if (window.innerHeight + getScrollY() >= document.documentElement.scrollHeight - 28) {
+        current = "contact";
       }
       setActive(current);
     };
@@ -68,7 +71,7 @@ export default function NavBar() {
 
         <ul className="nav desktop">
           {LINKS.map((link) => (
-            <li key={link.key || link.label}>{item(link)}</li>
+            <li key={link.label}>{item(link)}</li>
           ))}
         </ul>
 
@@ -106,7 +109,7 @@ export default function NavBar() {
       <div className={`mobile-menu ${open ? "show" : ""}`}>
         <ul className="mobile-nav">
           {LINKS.map((link) => (
-            <li key={`m-${link.key || link.label}`}>{item(link, true)}</li>
+            <li key={`m-${link.label}`}>{item(link, true)}</li>
           ))}
         </ul>
       </div>

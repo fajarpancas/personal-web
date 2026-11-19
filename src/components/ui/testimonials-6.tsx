@@ -121,6 +121,8 @@ function ProjectCard({
           src={img}
           alt={title}
           draggable={false}
+          loading="lazy"
+          decoding="async"
           className="h-full w-full object-cover"
         />
       </div>

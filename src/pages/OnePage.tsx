@@ -1,7 +1,11 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
+import { createPortal } from "react-dom";
+import { Check, ChevronLeft, ChevronRight, Copy } from "lucide-react";
 import { animate, motion, useReducedMotion } from "motion/react";
 import { TestimonialsSection } from "../components/ui/testimonials-6";
 import { usePortfolioContent } from "../lib/content";
+import { AI_CONTENT } from "../data/aiContent";
+import type { AiContentItem } from "../data/aiContent";
 import type { Experience, Project } from "../data/portfolio";
 import { getScrollY } from "../utils/scroll";
 
@@ -77,7 +81,7 @@ function scrollToSection(id: string) {
   });
 }
 
-const CHAPTERS = ["home", "apps", "about", "projects", "contact"] as const;
+const CHAPTERS = ["home", "apps", "about", "projects", "ai", "contact"] as const;
 type ChapterId = (typeof CHAPTERS)[number];
 
 const STEP_LABEL: Record<ChapterId, string> = {
@@ -85,6 +89,7 @@ const STEP_LABEL: Record<ChapterId, string> = {
   apps: "Projects",
   about: "The Studios",
   projects: "Selected works",
+  ai: "My AI Content",
   contact: "Write Me",
 };
 
@@ -108,10 +113,6 @@ function onSectionClick(event: React.MouseEvent<HTMLAnchorElement>, id: string) 
   revealChapter(id);
 }
 
-function atPageEnd() {
-  return window.innerHeight + getScrollY() >= document.documentElement.scrollHeight - 28;
-}
-
 function findProject(projects: Project[], title: string) {
   return projects.find((project) => project.title === title);
 }
@@ -133,18 +134,54 @@ function countOf(badge: string) {
 export default function OnePage() {
   const { content, loading } = usePortfolioContent();
   const [holdSkeleton, setHoldSkeleton] = useState(true);
-  const reduce = useReducedMotion();
-  const [shown, setShown] = useState(() => {
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return CHAPTERS.length;
-    const hash = window.location.hash.replace("#", "");
-    const index = CHAPTERS.indexOf(hash as ChapterId);
-    return index >= 0 ? index + 1 : 1;
-  });
+  const [shown] = useState(CHAPTERS.length);
   const [current, setCurrent] = useState(0);
-  const shownRef = useRef(shown);
-  const pending = useRef<string | null>(null);
-  const lock = useRef(false);
-  shownRef.current = shown;
+  const aiRailRef = useRef<HTMLDivElement>(null);
+  const aiDrag = useRef({ down: false, startX: 0, startScroll: 0, moved: false });
+  const [aiBar, setAiBar] = useState({ left: 0, width: 20 });
+  const [copied, setCopied] = useState(false);
+  const [aiItem, setAiItem] = useState<AiContentItem | null>(null);
+  const aiReturnRef = useRef<HTMLButtonElement | null>(null);
+
+  const closeAi = () => {
+    setAiItem(null);
+    aiReturnRef.current?.focus();
+  };
+
+  const scrollAi = (direction: 1 | -1) => {
+    const rail = aiRailRef.current;
+    if (!rail) return;
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    rail.scrollBy({
+      left: direction * Math.min(560, rail.clientWidth * 0.85),
+      behavior: reduceMotion ? "auto" : "smooth",
+    });
+  };
+
+  const updateAiBar = () => {
+    const rail = aiRailRef.current;
+    if (!rail) return;
+    const max = rail.scrollWidth - rail.clientWidth;
+    const width = rail.scrollWidth > 0 ? (rail.clientWidth / rail.scrollWidth) * 100 : 100;
+    const left = max > 0 ? (rail.scrollLeft / max) * (100 - width) : 0;
+    setAiBar({ left, width });
+  };
+
+  useEffect(() => {
+    updateAiBar();
+    window.addEventListener("resize", updateAiBar);
+    return () => window.removeEventListener("resize", updateAiBar);
+  }, [loading]);
+
+  const copyEmail = async () => {
+    try {
+      await navigator.clipboard.writeText(contact.email);
+      setCopied(true);
+      window.setTimeout(() => setCopied(false), 2000);
+    } catch {
+      setCopied(false);
+    }
+  };
   const { hero, about, experiences, contact, projects, footer } = content;
   const year = new Date().getFullYear();
   const portrait =
@@ -152,25 +189,10 @@ export default function OnePage() {
       ? "/portrait.png?v=2"
       : hero.profileImg;
 
-  const revealThrough = (count: number) => {
-    setShown((currentCount) => Math.max(currentCount, Math.min(CHAPTERS.length, count)));
-  };
-
-  const present = (id: string) => {
-    window.setTimeout(() => scrollToSection(id), 48);
-  };
-
   useEffect(() => {
     openChapter = (id: string) => {
       if (!isChapter(id)) return;
-      const index = CHAPTERS.indexOf(id);
-      if (reduce || index < shownRef.current) {
-        scrollToSection(id);
-        return;
-      }
-      pending.current = id;
-      revealThrough(index + 1);
-      present(id);
+      scrollToSection(id);
     };
     return () => {
       openChapter = (next) => {
@@ -180,71 +202,6 @@ export default function OnePage() {
   });
 
   useEffect(() => {
-    if (reduce) return;
-    const revealNext = () => {
-      if (lock.current || shownRef.current >= CHAPTERS.length) return;
-      const next = shownRef.current;
-      const id = CHAPTERS[next];
-      lock.current = true;
-      pending.current = id;
-      revealThrough(next + 1);
-      present(id);
-      window.setTimeout(() => {
-        lock.current = false;
-      }, 980);
-    };
-    let bucket = 0;
-    const onWheel = (event: WheelEvent) => {
-      if (document.querySelector(".fc-preview")) return;
-      if (event.deltaY <= 0) {
-        bucket = 0;
-        return;
-      }
-      if (lock.current) {
-        event.preventDefault();
-        return;
-      }
-      if (!atPageEnd() || shownRef.current >= CHAPTERS.length) {
-        bucket = 0;
-        return;
-      }
-      bucket += event.deltaY;
-      event.preventDefault();
-      if (bucket < 48) return;
-      bucket = 0;
-      revealNext();
-    };
-    let touchY = 0;
-    const onTouchStart = (event: TouchEvent) => {
-      touchY = event.touches[0]?.clientY ?? 0;
-    };
-    const onTouchEnd = (event: TouchEvent) => {
-      const end = event.changedTouches[0]?.clientY ?? touchY;
-      if (document.querySelector(".fc-preview")) return;
-      if (touchY - end < 56 || lock.current || !atPageEnd()) return;
-      revealNext();
-    };
-    const onKey = (event: KeyboardEvent) => {
-      const typing = event.target instanceof HTMLElement && event.target.closest("input, textarea, button, a");
-      if (typing) return;
-      if (event.key !== "ArrowDown" && event.key !== "PageDown" && event.key !== " ") return;
-      if (!atPageEnd() || shownRef.current >= CHAPTERS.length) return;
-      event.preventDefault();
-      revealNext();
-    };
-    window.addEventListener("wheel", onWheel, { passive: false });
-    window.addEventListener("touchstart", onTouchStart, { passive: true });
-    window.addEventListener("touchend", onTouchEnd, { passive: true });
-    window.addEventListener("keydown", onKey);
-    return () => {
-      window.removeEventListener("wheel", onWheel);
-      window.removeEventListener("touchstart", onTouchStart);
-      window.removeEventListener("touchend", onTouchEnd);
-      window.removeEventListener("keydown", onKey);
-    };
-  }, [reduce]);
-
-  useEffect(() => {
     const onScroll = () => {
       const pos = getScrollY() + 160;
       let next = 0;
@@ -252,6 +209,9 @@ export default function OnePage() {
         const el = document.getElementById(id);
         if (el && el.offsetHeight > 8 && el.offsetTop <= pos) next = index;
       });
+      if (window.innerHeight + getScrollY() >= document.documentElement.scrollHeight - 28) {
+        next = CHAPTERS.length - 1;
+      }
       setCurrent(next);
     };
     onScroll();
@@ -292,12 +252,10 @@ export default function OnePage() {
           <a className="fc-btn" href="#apps" onClick={(event) => onSectionClick(event, "apps")}>
             See the apps
           </a>
-          {shown === 1 ? (
-            <button className="fc-cue" type="button" onClick={() => revealChapter("apps")}>
-              Scroll
-              <i />
-            </button>
-          ) : null}
+          <button className="fc-cue" type="button" onClick={() => revealChapter("apps")}>
+            Scroll
+            <i />
+          </button>
         </div>
         <div className="fc-panel">
           <HeroMarks />
@@ -353,13 +311,107 @@ export default function OnePage() {
         </div>
       </Chapter>
 
-      <Chapter id="contact" open={shown > 4} label="Write Me">
+      <Chapter id="ai" open={shown > 4} label="My AI Content">
+        <div className="fc-band fc-ai">
+          <div className="fc-ai-top">
+            <header className="fc-block-head">
+              <h2 id="ai-title">My AI content</h2>
+              <p>Short vertical videos for parents, made with AI, in Indonesian.</p>
+            </header>
+            <div className="fc-ai-nav">
+              <button type="button" aria-label="Previous AI content" onClick={() => scrollAi(-1)}>
+                <ChevronLeft size={20} aria-hidden="true" />
+              </button>
+              <button type="button" aria-label="Next AI content" onClick={() => scrollAi(1)}>
+                <ChevronRight size={20} aria-hidden="true" />
+              </button>
+            </div>
+          </div>
+          <div
+            className="fc-ai-grid"
+            ref={aiRailRef}
+            aria-label="AI content"
+            onScroll={updateAiBar}
+            onPointerDown={(event) => {
+              if (event.pointerType !== "mouse") return;
+              aiDrag.current = { down: true, startX: event.clientX, startScroll: event.currentTarget.scrollLeft, moved: false };
+              event.currentTarget.setPointerCapture(event.pointerId);
+            }}
+            onPointerMove={(event) => {
+              if (!aiDrag.current.down) return;
+              const dx = event.clientX - aiDrag.current.startX;
+              if (Math.abs(dx) > 6) {
+                aiDrag.current.moved = true;
+                event.currentTarget.classList.add("is-dragging");
+              }
+              if (aiDrag.current.moved) event.currentTarget.scrollLeft = aiDrag.current.startScroll - dx;
+            }}
+            onPointerUp={(event) => {
+              aiDrag.current.down = false;
+              event.currentTarget.classList.remove("is-dragging");
+            }}
+            onPointerCancel={(event) => {
+              aiDrag.current.down = false;
+              event.currentTarget.classList.remove("is-dragging");
+            }}
+            onClickCapture={(event) => {
+              if (!aiDrag.current.moved) return;
+              event.preventDefault();
+              event.stopPropagation();
+              aiDrag.current.moved = false;
+            }}
+          >
+            {AI_CONTENT.map((item) => (
+              <button
+                key={item.title}
+                type="button"
+                className="fc-card is-pick fc-ai-card"
+                onClick={(event) => {
+                  aiReturnRef.current = event.currentTarget;
+                  setAiItem(item);
+                }}
+                aria-label={`${item.title} (opens preview)`}
+              >
+                <span className="fc-shot">
+                  <img src={item.img} alt="" loading="lazy" decoding="async" />
+                  {item.url ? (
+                    <span className="fc-ai-play" aria-hidden="true">
+                      <svg viewBox="0 0 16 16">
+                        <path d="M4.5 2.8v10.4L12.8 8Z" fill="currentColor" />
+                      </svg>
+                    </span>
+                  ) : null}
+                </span>
+                <span className="fc-card-copy">
+                  <span className="fc-card-name">{item.title}</span>
+                  <span className="fc-card-blurb">{item.desc}</span>
+                  <span className="fc-ai-meta">{item.meta}</span>
+                  {item.url ? <span className="fc-ai-watch">Play video</span> : null}
+                </span>
+              </button>
+            ))}
+          </div>
+          <div className="fc-ai-progress" aria-hidden="true">
+            <span style={{ width: `${aiBar.width}%`, marginLeft: `${aiBar.left}%` }} />
+          </div>
+          {aiItem ? <AiPreview item={aiItem} onClose={closeAi} /> : null}
+        </div>
+      </Chapter>
+
+      <Chapter id="contact" open={shown > 5} label="Write Me">
         <div className="fc-band">
           <div className="fc-write">
             <div>
               <h2 id="write-title">{voice(contact.title || "Write me")}</h2>
               <p>{plain(contact.intro)}</p>
-              <a className="fc-mail" href={`mailto:${contact.email}`}>{contact.email}</a>
+              <span className="fc-mail-row">
+                <a className="fc-mail" href={`mailto:${contact.email}`}>{contact.email}</a>
+                <button type="button" className="fc-copy" onClick={copyEmail} aria-label="Copy email address">
+                  {copied ? <Check size={15} aria-hidden="true" /> : <Copy size={15} aria-hidden="true" />}
+                  {copied ? "Copied" : "Copy"}
+                </button>
+                <span className="fc-sr" role="status">{copied ? "Email copied" : ""}</span>
+              </span>
               <div className="fc-text-links">
                 <a href={contact.linkedinUrl} target="_blank" rel="noreferrer">LinkedIn</a>
                 <a href={contact.githubUrl} target="_blank" rel="noreferrer">GitHub</a>
@@ -375,6 +427,7 @@ export default function OnePage() {
             <a href="#apps" onClick={(event) => onSectionClick(event, "apps")}>Projects</a>
             <a href="#projects" onClick={(event) => onSectionClick(event, "projects")}>Every Title</a>
             <a href="#about" onClick={(event) => onSectionClick(event, "about")}>Career</a>
+            <a href="#ai" onClick={(event) => onSectionClick(event, "ai")}>AI Content</a>
             <a href="#contact" onClick={(event) => onSectionClick(event, "contact")}>Write Me</a>
           </nav>
           <p className="fc-quiet">{plain(footer).replace("{year}", String(year))}</p>
@@ -437,15 +490,15 @@ function Chapter({
     >
       <motion.div
         className="fc-chapter-in"
-        initial={false}
-        animate={open ? "show" : "hide"}
+        initial="hide"
+        whileInView="show"
+        viewport={{ once: true, amount: 0.12 }}
         variants={{
-          hide: { opacity: 0, y: 72, filter: "blur(14px)" },
+          hide: { opacity: 0, y: 36 },
           show: {
             opacity: 1,
             y: 0,
-            filter: "blur(0px)",
-            transition: { duration: 0.95, delay: 0.06, ease: [0.16, 1, 0.3, 1] },
+            transition: { duration: 0.7, delay: 0.04, ease: [0.16, 1, 0.3, 1] },
           },
         }}
       >
@@ -510,6 +563,86 @@ function ProjectCard({
     <a className={className} href={href} target="_blank" rel="noreferrer">
       {body}
     </a>
+  );
+}
+
+function drivePreviewUrl(url: string): string | null {
+  const match = url.match(/drive\.google\.com\/file\/d\/([^/]+)/);
+  return match ? `https://drive.google.com/file/d/${match[1]}/preview` : null;
+}
+
+function AiPreview({ item, onClose }: { item: AiContentItem; onClose: () => void }) {
+  const titleId = useId();
+  const dialogRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === "Escape") onClose();
+    };
+    window.addEventListener("keydown", onKey);
+    const previous = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    dialogRef.current?.focus();
+    return () => {
+      window.removeEventListener("keydown", onKey);
+      document.body.style.overflow = previous;
+    };
+  }, [onClose]);
+
+  const preview = item.url ? drivePreviewUrl(item.url) : null;
+
+  return createPortal(
+    <div className="fc-preview" role="presentation" onClick={onClose}>
+      <div
+        ref={dialogRef}
+        className="fc-ai-modal-card"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby={titleId}
+        tabIndex={-1}
+        onClick={(event) => event.stopPropagation()}
+      >
+        <button type="button" className="fc-ai-x" aria-label="Close preview" onClick={onClose}>
+          <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M6 6L18 18M6 18L18 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+          </svg>
+        </button>
+        {preview ? (
+          <div className="fc-ai-frame">
+            <iframe
+              src={preview}
+              title={`${item.title} video`}
+              loading="lazy"
+              allow="autoplay; encrypted-media; fullscreen; picture-in-picture"
+              allowFullScreen
+              referrerPolicy="strict-origin-when-cross-origin"
+            />
+          </div>
+        ) : (
+          <div className="fc-ai-frame is-cover">
+            <img src={item.img} alt="" />
+          </div>
+        )}
+        <div className="fc-ai-modal-copy">
+          <h3 id={titleId}>{item.title}</h3>
+          <p className="fc-ai-modal-meta">{item.meta}</p>
+          <p>{item.desc}</p>
+          <div className="fc-ai-modal-actions">
+            {item.url ? (
+              <a className="fc-ai-drive" href={item.url} target="_blank" rel="noreferrer">
+                Open in Drive ↗
+              </a>
+            ) : (
+              <span />
+            )}
+            <button type="button" className="fc-btn" onClick={onClose}>
+              Close
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>,
+    document.body,
   );
 }
 

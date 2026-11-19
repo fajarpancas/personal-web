@@ -195,8 +195,14 @@ body.is-folio .theme-toggle{
   border-radius:50%;
   background:var(--green);
   color:#fff;
-  flex:0 0 auto
+  flex:0 0 auto;
+  transition:box-shadow .3s ease;
+  box-shadow:0 0 0 0 rgba(52,216,106,0)
 }
+body.is-folio .theme-toggle:hover{
+  box-shadow:0 0 0 6px rgba(52,216,106,.22),0 4px 16px rgba(52,216,106,.45)
+}
+body.is-folio .theme-toggle:active{box-shadow:0 0 0 3px rgba(52,216,106,.3)}
 body.is-folio .theme-toggle-thumb{
   width:36px;
   height:36px;
@@ -209,21 +215,67 @@ body.is-folio .theme-toggle-thumb{
 body.is-folio .theme-toggle-thumb svg{
   grid-area:1 / 1;
   width:18px;
-  height:18px
+  height:18px;
+  transition:opacity .4s ease,transform .8s cubic-bezier(.34,1.56,.64,1)
 }
-body.is-folio .theme-toggle-thumb .sun{opacity:0}
-body.is-folio .theme-toggle-thumb .moon{opacity:1}
-html[data-theme="dark"] body.is-folio .theme-toggle-thumb .sun{opacity:1}
-html[data-theme="dark"] body.is-folio .theme-toggle-thumb .moon{opacity:0}
+body.is-folio .theme-toggle-thumb .sun{opacity:0;transform:rotate(-150deg) scale(.3)}
+body.is-folio .theme-toggle-thumb .moon{opacity:1;transform:rotate(0deg) scale(1)}
+html[data-theme="dark"] body.is-folio .theme-toggle-thumb .sun{opacity:1;transform:rotate(0deg) scale(1)}
+html[data-theme="dark"] body.is-folio .theme-toggle-thumb .moon{opacity:0;transform:rotate(150deg) scale(.3)}
+
+/* ── Theme eclipse transition ──────────────────────── */
 @property --r{syntax:"<length>";inherits:false;initial-value:0px}
-.theme-veil{
+.theme-eclipse{
   position:fixed;
   inset:0;
   z-index:200;
   pointer-events:none;
+  overflow:hidden
+}
+.theme-eclipse-veil{
+  position:absolute;
+  inset:0;
   --r:0px;
   -webkit-mask:radial-gradient(circle at var(--theme-x) var(--theme-y), transparent var(--r), #000 calc(var(--r) + 1px));
   mask:radial-gradient(circle at var(--theme-x) var(--theme-y), transparent var(--r), #000 calc(var(--r) + 1px))
+}
+.theme-eclipse-rings{position:absolute;inset:0;overflow:visible}
+.theme-eclipse-rings circle{fill:none}
+.theme-eclipse-rings .ring-main{stroke-width:3px}
+.theme-eclipse-rings .ring-shock{stroke-width:1.5px}
+.theme-eclipse.to-dark .ring-main{
+  stroke:#d8ffe4;
+  filter:drop-shadow(0 0 10px #5ee08a) drop-shadow(0 0 30px rgba(94,224,138,.85))
+}
+.theme-eclipse.to-dark .ring-shock{
+  stroke:#5ee08a;
+  filter:drop-shadow(0 0 8px rgba(94,224,138,.9))
+}
+.theme-eclipse.to-light .ring-main{
+  stroke:#fff6dd;
+  filter:drop-shadow(0 0 10px #f5b81e) drop-shadow(0 0 30px rgba(245,184,30,.85))
+}
+.theme-eclipse.to-light .ring-shock{
+  stroke:#f5b81e;
+  filter:drop-shadow(0 0 8px rgba(245,184,30,.9))
+}
+.theme-eclipse-flash{
+  position:absolute;
+  width:360px;
+  height:360px;
+  margin:-180px 0 0 -180px;
+  border-radius:50%
+}
+.theme-eclipse.to-dark .theme-eclipse-flash{
+  background:radial-gradient(circle,#fff 0%,rgba(94,224,138,.5) 38%,transparent 68%)
+}
+.theme-eclipse.to-light .theme-eclipse-flash{
+  background:radial-gradient(circle,#fff 0%,rgba(245,184,30,.55) 38%,transparent 68%)
+}
+.theme-eclipse-particle{
+  position:absolute;
+  border-radius:999px;
+  will-change:transform,opacity
 }
 
 .fc{width:100%;margin:0;padding-top:0;color:var(--ink)}
@@ -361,7 +413,7 @@ html[data-theme="dark"] body.is-folio .theme-toggle-thumb .moon{opacity:0}
 }
 
 .fc-chapter{overflow:hidden;background:var(--bg)}
-.fc-chapter-in{will-change:transform,opacity,filter}
+.fc-chapter-in{will-change:transform,opacity}
 .fc-cue{
   display:inline-flex;
   align-items:center;
@@ -557,6 +609,117 @@ html[data-theme="dark"] body.is-folio .fc-now .fc-when{color:var(--green-ink)}
 .fc-card.is-pick .fc-card-blurb{color:var(--card-muted)}
 .fc-card.is-pick .fc-shot{aspect-ratio:16 / 11}
 
+.fc-ai{padding-top:56px;padding-bottom:48px}
+.fc-ai-top{display:flex;align-items:flex-end;justify-content:space-between;gap:24px}
+.fc-ai .fc-block-head{margin-bottom:0}
+.fc-ai-nav{display:flex;gap:8px;flex:0 0 auto}
+.fc-ai-nav button{
+  width:44px;
+  height:44px;
+  padding:0;
+  border:1px solid var(--line);
+  border-radius:50%;
+  background:var(--card);
+  color:var(--card-ink);
+  display:grid;
+  place-items:center
+}
+.fc-ai-nav button:hover{border-color:var(--green-ink);color:var(--green-ink)}
+.fc-ai-grid{
+  display:flex;
+  gap:16px;
+  margin-top:28px;
+  padding:4px 4px 12px;
+  overflow-x:auto;
+  scroll-snap-type:x mandatory;
+  scrollbar-width:none;
+  text-align:left
+}
+.fc-ai-grid::-webkit-scrollbar{display:none}
+.fc-ai-grid{cursor:grab}
+.fc-ai-grid.is-dragging{cursor:grabbing;scroll-snap-type:none}
+.fc-ai-grid.is-dragging .fc-ai-card{pointer-events:none}
+.fc-ai-grid img{-webkit-user-drag:none;user-select:none}
+.fc-ai-progress{height:3px;margin-top:2px;border-radius:999px;background:var(--line);overflow:hidden}
+.fc-ai-progress span{display:block;height:100%;border-radius:inherit;background:var(--green-ink)}
+.fc-ai-card{flex:0 0 264px;scroll-snap-align:start}
+button.fc-card{font:inherit;text-align:left}
+button.fc-ai-card{cursor:pointer}
+.fc-ai-card .fc-shot{position:relative;aspect-ratio:3 / 4}
+.fc-ai-card .fc-shot img{object-position:top}
+.fc-ai-meta{color:var(--quiet);font-size:12px;margin-top:2px}
+.fc-ai-watch{color:var(--green-ink);font-size:13px;font-weight:600;margin-top:4px}
+.fc-ai-card:hover .fc-card-name{color:var(--green-ink)}
+.fc-ai-play{
+  position:absolute;
+  left:50%;
+  top:50%;
+  width:52px;
+  height:52px;
+  border-radius:50%;
+  background:rgba(10,12,10,.62);
+  color:#fff;
+  display:grid;
+  place-items:center;
+  transform:translate(-50%,-50%);
+  transition:background .2s ease,transform .2s ease
+}
+.fc-ai-play svg{width:20px;height:20px;margin-left:2px}
+.fc-ai-card:hover .fc-ai-play{background:var(--green);transform:translate(-50%,-50%) scale(1.06)}
+
+/* ── AI content modal ─────────────────────────────── */
+.fc-ai-modal-card{
+  position:relative;
+  width:min(400px,100%);
+  max-height:calc(100dvh - 48px);
+  overflow:auto;
+  background:var(--nav);
+  color:var(--card-ink);
+  border:1px solid var(--line);
+  border-radius:24px;
+  box-shadow:var(--shadow);
+  animation:fc-pop .45s cubic-bezier(.16,1,.3,1)
+}
+.fc-ai-frame{position:relative;width:100%;aspect-ratio:9 / 16;max-height:58vh;background:#0b0d0c}
+.fc-ai-frame iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+.fc-ai-frame.is-cover{overflow:hidden}
+.fc-ai-frame.is-cover img{width:100%;height:100%;object-fit:cover;object-position:top}
+.fc-ai-modal-copy{display:flex;flex-direction:column;gap:8px;padding:20px 20px 18px}
+.fc-ai-modal-copy h3{font-size:20px;letter-spacing:-.02em}
+.fc-ai-modal-copy p{color:var(--card-muted);font-size:14px;line-height:1.55}
+.fc-ai-modal-copy .fc-ai-modal-meta{color:var(--quiet);font-size:12px}
+.fc-ai-modal-actions{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  margin-top:8px
+}
+.fc-ai-drive{color:var(--green-ink);font-size:14px;font-weight:600;text-decoration:none}
+.fc-ai-x{
+  position:absolute;
+  top:10px;
+  right:10px;
+  z-index:2;
+  width:36px;
+  height:36px;
+  border:0;
+  border-radius:50%;
+  background:rgba(10,12,10,.62);
+  color:#fff;
+  display:grid;
+  place-items:center
+}
+.fc-ai-x:hover{background:rgba(10,12,10,.85)}
+@keyframes fc-pop{
+  from{opacity:0;transform:translateY(16px) scale(.97)}
+  to{opacity:1;transform:none}
+}
+@media (prefers-reduced-motion: reduce){
+  .fc-ai-modal-card{animation:none}
+  .fc-ai-play{transition:none}
+}
+
 .fc-write{
   display:grid;
   grid-template-columns:minmax(0,.9fr) minmax(280px,1fr);
@@ -572,6 +735,22 @@ html[data-theme="dark"] body.is-folio .fc-now .fc-when{color:var(--green-ink)}
   font-weight:600;
   text-decoration:none
 }
+.fc-mail-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.fc-mail-row .fc-mail{margin-top:16px}
+.fc-copy{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  min-height:32px;
+  margin-top:16px;
+  padding:0 10px;
+  border:1px solid var(--line);
+  border-radius:999px;
+  background:var(--card);
+  color:var(--card-ink);
+  font:600 12px/1 Inter,sans-serif
+}
+.fc-copy:hover{border-color:var(--green-ink);color:var(--green-ink)}
 .fc-text-links{display:flex;gap:16px;margin-top:12px}
 .fc-text-links a,.fc-foot nav a{color:var(--muted);text-decoration:none;font-size:14px}
 .fc-text-links a:hover,.fc-foot nav a:hover,.fc-mail:hover{color:var(--ink)}
@@ -653,6 +832,7 @@ html[data-theme="dark"] body.is-folio .fc-now .fc-when{color:var(--green-ink)}
 @media (max-width: 640px){
   .fc-hero h1{font-size:44px}
   .fc-bento,.fc-picks{grid-template-columns:1fr}
+  .fc-ai-card{flex-basis:min(72vw,264px)}
   .fc-card.is-wide{grid-column:auto}
   .fc-card.is-wide .fc-shot,.fc-shot{aspect-ratio:16 / 10}
   .fc-talk{display:none}
